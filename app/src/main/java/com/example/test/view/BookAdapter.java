@@ -17,10 +17,14 @@ import java.util.List;
 
 public class BookAdapter extends RecyclerView.Adapter<BookAdapter.BookViewHolder> {
     private List<Book> bookList = new ArrayList<>();
+    private OnBookClickListener listener;
 
     public void setBooks(List<Book> books) {
         this.bookList = books;
         notifyDataSetChanged();
+    }
+    public void setOnBookClickListener(OnBookClickListener listener) {
+        this.listener = listener;
     }
 
     @Override
@@ -34,6 +38,12 @@ public class BookAdapter extends RecyclerView.Adapter<BookAdapter.BookViewHolder
         Book book = bookList.get(position);
         holder.title.setText(book.getTitle());
         Glide.with(holder.itemView.getContext()).load(book.getImageUrl()).into(holder.cover);
+        holder.itemView.setOnClickListener(v -> {
+            if (listener != null) listener.onBookClick(book);
+        });
+        holder.title.setOnClickListener(v -> {
+            if (listener != null) listener.onBookClick(book);
+        });
     }
 
     @Override
@@ -50,5 +60,9 @@ public class BookAdapter extends RecyclerView.Adapter<BookAdapter.BookViewHolder
             title = itemView.findViewById(R.id.textTitle);
             cover = itemView.findViewById(R.id.imageCover);
         }
+    }
+
+    public interface OnBookClickListener {
+        void onBookClick(Book book);
     }
 }

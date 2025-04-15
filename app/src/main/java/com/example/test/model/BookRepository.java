@@ -30,14 +30,19 @@ public class BookRepository {
 
                 for (Element el : bookElements) {
                     String title = el.attr("title");  // 書名
-                    String img = el.select("img").attr("src");  // 圖片網址
+                    String img = el.select("img").attr("data-src");  // 圖片網址
                     String update = el.select(".tt").text();    // 更新資訊
+                    String href =  el.attr("href"); // 書籍連結
+                    String pageUrl = "https://tw.manhuagui.com" + href;
 
+                    if (img == null || img.isEmpty()) {
+                        img = el.select("img").attr("src");
+                    }
                     if (!img.startsWith("http")) {
                         img = "https:" + img;
                     }
 
-                    books.add(new Book(title + "（" + update + "）", img));
+                    books.add(new Book(title + "（" + update + "）", img, pageUrl));
                 }
 
 
