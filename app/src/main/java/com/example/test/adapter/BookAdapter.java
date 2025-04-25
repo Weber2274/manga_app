@@ -1,4 +1,4 @@
-package com.example.test.view;
+package com.example.test.adapter;
 
 import android.view.LayoutInflater;
 import android.view.View;
@@ -20,8 +20,8 @@ public class BookAdapter extends RecyclerView.Adapter<BookAdapter.BookViewHolder
     private List<Book> bookList = new ArrayList<>();
     private OnBookClickListener listener;
 
-    public void setBooks(List<Book> books) {
-        this.bookList = books;
+    public void setBooks(List<Book> mangases) {
+        this.bookList = mangases;
         notifyDataSetChanged();
     }
     public void setOnBookClickListener(OnBookClickListener listener) {

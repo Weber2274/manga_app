@@ -11,10 +11,10 @@ import android.widget.Toast;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.GridLayoutManager;
-import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.test.R;
+import com.example.test.adapter.BookAdapter;
 import com.example.test.viewmodel.BookViewModel;
 
 public class BookFragment extends Fragment {

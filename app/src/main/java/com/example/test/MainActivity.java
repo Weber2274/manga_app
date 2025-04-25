@@ -14,10 +14,11 @@ import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.test.model.Book;
-import com.example.test.view.BookAdapter;
+import com.example.test.adapter.BookAdapter;
 import com.example.test.view.BookFragment;
 import com.example.test.view.FilterFragment;
 import com.example.test.view.HistoryFragment;
+import com.example.test.view.HomeFragment;
 import com.example.test.view.LikeFragment;
 import com.example.test.view.SettingFragment;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
@@ -26,9 +27,7 @@ import com.google.android.material.navigation.NavigationBarView;
 import java.util.List;
 
 public class MainActivity extends AppCompatActivity {
-    RecyclerView recyclerView;
-    BookAdapter adapter;
-    List<Book> bookList;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -56,14 +55,15 @@ public class MainActivity extends AppCompatActivity {
         Fragment historyFragment = HistoryFragment.newInstance("", "");
         Fragment likeFragment = LikeFragment.newInstance("", "");
         Fragment settingFragment = SettingFragment.newInstance("", "");
+        Fragment homeFragment = HomeFragment.newInstance("","");
 
-        setCurrentFragment(bookFragment);
+        setCurrentFragment(homeFragment);
 
         bottomNavigationView.setOnItemSelectedListener(new NavigationBarView.OnItemSelectedListener() {
             @Override
             public boolean onNavigationItemSelected(@NonNull MenuItem item) {
                 if(item.getItemId() == R.id.nav_home) {
-                    setCurrentFragment(bookFragment);
+                    setCurrentFragment(homeFragment);
                 } else if (item.getItemId() == R.id.nav_filter) {
                     setCurrentFragment(filterFragment);
                 }else if (item.getItemId() == R.id.nav_history) {
