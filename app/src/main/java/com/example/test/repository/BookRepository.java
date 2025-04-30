@@ -1,5 +1,7 @@
 package com.example.test.repository;
 
+import android.util.Log;
+
 import com.example.test.model.Book;
 
 import org.jsoup.Jsoup;
@@ -43,7 +45,7 @@ public class BookRepository {
                     if (!img.startsWith("http")) {
                         img = "https:" + img;
                     }
-
+                    Log.d("BookRepository",title);
                     mangases.add(new Book(title + "（" + update + "）", img, pageUrl));
                 }
 

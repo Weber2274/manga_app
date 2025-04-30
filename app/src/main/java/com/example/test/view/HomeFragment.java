@@ -67,7 +67,7 @@ public class HomeFragment extends Fragment {
     }
     private RecyclerView recyclerView;
     private HomeAdapter adapter;
-    private HomeViewModel viewModel;
+    HomeViewModel viewModel;
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {

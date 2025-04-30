@@ -47,19 +47,22 @@ public class HomeRepository {
                         String title = element.select("a").attr("title");
                         String imgUrl = element.select("img").attr("src");
 
-                        imgUrl = "https:" + imgUrl;
+                        if (!imgUrl.startsWith("http")) {
+                            imgUrl = "https:" + imgUrl;
+                        }
 
                         String href = element.select("a").attr("href");
                         String pageUrl = "https://tw.manhuagui.com" + href;
-                        Log.d("HomeRepository",imgUrl);
+                        Log.d("HomeRepository",title);
                         // 建立 Book 物件並加入列表
-                        if (title != null && !title.isEmpty()) {
-                            bookList.add(new Book(title, imgUrl, pageUrl));
-                        }
+
+                        bookList.add(new Book(title, imgUrl, pageUrl));
+                        Thread.sleep(500);
+
                     }
-                    if (!bookList.isEmpty()) {
-                        mangaGroupList.add(new MangaGroup(tag, bookList));
-                    }
+
+                    mangaGroupList.add(new MangaGroup(tag, bookList));
+
                 }
                 listener.onSuccess(mangaGroupList);
 
@@ -67,6 +70,8 @@ public class HomeRepository {
             } catch (IOException e) {
                 e.printStackTrace();
                 listener.onError("資料抓取失敗: " + e.getMessage());
+            } catch (InterruptedException e) {
+                throw new RuntimeException(e);
             }
         }).start();
     }

@@ -59,22 +59,19 @@ public class MainActivity extends AppCompatActivity {
 
         setCurrentFragment(homeFragment);
 
-        bottomNavigationView.setOnItemSelectedListener(new NavigationBarView.OnItemSelectedListener() {
-            @Override
-            public boolean onNavigationItemSelected(@NonNull MenuItem item) {
-                if(item.getItemId() == R.id.nav_home) {
-                    setCurrentFragment(homeFragment);
-                } else if (item.getItemId() == R.id.nav_filter) {
-                    setCurrentFragment(filterFragment);
-                }else if (item.getItemId() == R.id.nav_history) {
-                    setCurrentFragment(historyFragment);
-                }else if (item.getItemId() == R.id.nav_like) {
-                    setCurrentFragment(likeFragment);
-                } else {
-                    setCurrentFragment(settingFragment);
-                }
-                return true;
+        bottomNavigationView.setOnItemSelectedListener(item -> {
+            if(item.getItemId() == R.id.nav_home) {
+                setCurrentFragment(homeFragment);
+            } else if (item.getItemId() == R.id.nav_filter) {
+                setCurrentFragment(filterFragment);
+            }else if (item.getItemId() == R.id.nav_history) {
+                setCurrentFragment(historyFragment);
+            }else if (item.getItemId() == R.id.nav_like) {
+                setCurrentFragment(likeFragment);
+            } else {
+                setCurrentFragment(settingFragment);
             }
+            return true;
         });
 
     }

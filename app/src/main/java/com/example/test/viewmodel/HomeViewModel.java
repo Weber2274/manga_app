@@ -17,12 +17,13 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class HomeViewModel extends ViewModel {
-    private MutableLiveData<List<ItemList>> flatListLiveData = new MutableLiveData<>();
+    private MutableLiveData<List<ItemList>> flatListLiveData;
     private HomeRepository homeRepository;
     private MutableLiveData<String> errorLiveData;
     public HomeViewModel() {
         homeRepository = new HomeRepository();
         flatListLiveData = new MutableLiveData<>();
+        errorLiveData = new MutableLiveData<>();
     }
     public LiveData<List<ItemList>> getCategories() {
         return flatListLiveData;
