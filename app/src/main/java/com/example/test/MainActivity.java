@@ -1,8 +1,11 @@
 package com.example.test;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.Button;
+import android.widget.Toolbar;
 
 import androidx.activity.EdgeToEdge;
 import androidx.annotation.NonNull;
@@ -20,6 +23,7 @@ import com.example.test.view.FilterFragment;
 import com.example.test.view.HistoryFragment;
 import com.example.test.view.HomeFragment;
 import com.example.test.view.LikeFragment;
+import com.example.test.view.LoginActivity;
 import com.example.test.view.SettingFragment;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.navigation.NavigationBarView;
@@ -28,7 +32,7 @@ import java.util.List;
 
 public class MainActivity extends AppCompatActivity {
 
-
+    private Button btnLogin;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -47,7 +51,7 @@ public class MainActivity extends AppCompatActivity {
                 return insets;
             }
         });
-
+        btnLogin = findViewById(R.id.login_btn);
         bottomNavigationView.setItemIconTintList(null);
 
         Fragment bookFragment = BookFragment.newInstance("", "");
@@ -73,7 +77,13 @@ public class MainActivity extends AppCompatActivity {
             }
             return true;
         });
-
+        btnLogin.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent intent = new Intent(MainActivity.this, LoginActivity.class);
+                startActivity(intent);
+            }
+        });
     }
 
     private void setCurrentFragment(Fragment fragment) {
