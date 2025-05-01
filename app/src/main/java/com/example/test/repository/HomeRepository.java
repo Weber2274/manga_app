@@ -30,48 +30,57 @@ public class HomeRepository {
                 List<MangaGroup> mangaGroupList = new ArrayList<>();
 
                 Elements tags = doc.select("#cmt-tab li");
-                Elements mangas = doc.select("#cmt-cont ul.cover-list li");
-                int mangaPerCategory = mangas.size() / tags.size();
-
-                for(int i = 0; i < tags.size(); i++){
+                Log.d("tags", String.valueOf(tags.size()));
+                Elements coverLists = doc.select("#cmt-cont ul.cover-list");
+                for (int i = 0; i < tags.size(); i++) {
                     String tag = tags.get(i).text();
+                    Element ul = coverLists.get(i);
+                    Elements mangaLis = ul.select("li");
+                    Log.d("mangaLis", String.valueOf(mangaLis));
+
                     List<Book> bookList = new ArrayList<>();
-                    int startIndex = i * mangaPerCategory;
-                    int endIndex = (i + 1) * mangaPerCategory;
-                    if (i == tags.size() - 1) {
-                        endIndex = mangas.size();
-                    }
-                    for (int j = startIndex; j < endIndex; j++) {
-                        Element element = mangas.get(j);
+                    if(i == 0){
+                        for (Element element : mangaLis) {
+                            String title = element.select("a").attr("title");
+                            String imgUrl = element.select("img").attr("src");
 
-                        String title = element.select("a").attr("title");
-                        String imgUrl = element.select("img").attr("src");
+                            if (!imgUrl.startsWith("http")) {
+                                imgUrl = "https:" + imgUrl;
+                            }
+                            Log.d("imgUrl", imgUrl);
+                            String href = element.select("a").attr("href");
+                            String pageUrl = "https://tw.manhuagui.com" + href;
 
-                        if (!imgUrl.startsWith("http")) {
-                            imgUrl = "https:" + imgUrl;
+                            bookList.add(new Book(title, imgUrl, pageUrl));
+                            Log.d("bookList", String.valueOf(bookList.size()));
                         }
+                    }
+                    else{
+                        for (Element element : mangaLis) {
+                            String title = element.select("a").attr("title");
+                            String imgUrl = element.select("img").attr("data-src");
 
-                        String href = element.select("a").attr("href");
-                        String pageUrl = "https://tw.manhuagui.com" + href;
-                        Log.d("HomeRepository",title);
-                        // 建立 Book 物件並加入列表
+                            if (!imgUrl.startsWith("http")) {
+                                imgUrl = "https:" + imgUrl;
+                            }
+                            Log.d("imgUrl", imgUrl);
+                            String href = element.select("a").attr("href");
+                            String pageUrl = "https://tw.manhuagui.com" + href;
 
-                        bookList.add(new Book(title, imgUrl, pageUrl));
-                        Thread.sleep(500);
-
+                            bookList.add(new Book(title, imgUrl, pageUrl));
+                            Log.d("bookList", String.valueOf(bookList.size()));
+                        }
                     }
 
                     mangaGroupList.add(new MangaGroup(tag, bookList));
-
                 }
+                Log.d("MangaGroup", String.valueOf(mangaGroupList.size()));
                 listener.onSuccess(mangaGroupList);
 
 
             } catch (IOException e) {
                 e.printStackTrace();
                 listener.onError("資料抓取失敗: " + e.getMessage());
-            } catch (InterruptedException e) {
-                throw new RuntimeException(e);
             }
         }).start();
     }

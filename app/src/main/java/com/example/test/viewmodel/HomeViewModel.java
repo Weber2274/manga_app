@@ -47,6 +47,7 @@ public class HomeViewModel extends ViewModel {
                     }
 
                 }
+                Log.d("HomeViewModel", "總共資料筆數: " + flatList.size());
                 flatListLiveData.postValue(flatList);
 
             }
