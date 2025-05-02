@@ -32,7 +32,7 @@ import java.util.List;
 
 public class MainActivity extends AppCompatActivity {
 
-    private Button btnLogin;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -51,7 +51,7 @@ public class MainActivity extends AppCompatActivity {
                 return insets;
             }
         });
-        btnLogin = findViewById(R.id.login_btn);
+
         bottomNavigationView.setItemIconTintList(null);
 
         Fragment bookFragment = BookFragment.newInstance("", "");
@@ -77,13 +77,7 @@ public class MainActivity extends AppCompatActivity {
             }
             return true;
         });
-        btnLogin.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Intent intent = new Intent(MainActivity.this, LoginActivity.class);
-                startActivity(intent);
-            }
-        });
+
     }
 
     private void setCurrentFragment(Fragment fragment) {

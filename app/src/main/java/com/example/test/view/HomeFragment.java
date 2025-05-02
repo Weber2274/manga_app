@@ -1,5 +1,6 @@
 package com.example.test.view;
 
+import android.content.Intent;
 import android.os.Bundle;
 
 import androidx.fragment.app.Fragment;
@@ -11,13 +12,11 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 
 import com.example.test.R;
 import com.example.test.adapter.HomeAdapter;
-import com.example.test.model.ItemList;
 import com.example.test.viewmodel.HomeViewModel;
-
-import java.util.List;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -67,12 +66,21 @@ public class HomeFragment extends Fragment {
     }
     private RecyclerView recyclerView;
     private HomeAdapter adapter;
+    private Button btnLogin;
     HomeViewModel viewModel;
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_home, container, false);
+        btnLogin = view.findViewById(R.id.login_btn);
+        btnLogin.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent intent = new Intent(requireActivity(), LoginActivity.class);
+                startActivity(intent);
+            }
+        });
         recyclerView = view.findViewById(R.id.home_recyclerView);
         adapter = new HomeAdapter();
         recyclerView.setAdapter(adapter);
@@ -90,8 +98,8 @@ public class HomeFragment extends Fragment {
         recyclerView.setLayoutManager(layoutManager);
 
         viewModel = new ViewModelProvider(this).get(HomeViewModel.class);
-        viewModel.loadCategories();
-        viewModel.getCategories().observe(getViewLifecycleOwner(), items -> {
+        viewModel.loadMangas();
+        viewModel.getMangas().observe(getViewLifecycleOwner(), items -> {
 
             if (items != null) {
                 Log.d("HomeFragment", "Items loaded: " + items.size());

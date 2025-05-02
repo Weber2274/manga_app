@@ -25,15 +25,15 @@ public class HomeViewModel extends ViewModel {
         flatListLiveData = new MutableLiveData<>();
         errorLiveData = new MutableLiveData<>();
     }
-    public LiveData<List<ItemList>> getCategories() {
+    public LiveData<List<ItemList>> getMangas() {
         return flatListLiveData;
     }
     public LiveData<String> getError() {
         return errorLiveData;
     }
 
-    public void loadCategories() {
-        homeRepository.fetchMangaFromHomePage(new HomeRepository.OnCategoriesLoadedListener() {
+    public void loadMangas() {
+        homeRepository.fetchMangaFromHomePage(new HomeRepository.OnHomePageLoadedListener() {
             @Override
             public void onSuccess(List<MangaGroup> categories) {
                 List<ItemList> flatList = new ArrayList<>();

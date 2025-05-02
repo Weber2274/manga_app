@@ -13,20 +13,25 @@ import org.jsoup.select.Elements;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Random;
 
 public class HomeRepository {
-    public interface OnCategoriesLoadedListener {
+    public interface OnHomePageLoadedListener {
         void onSuccess(List<MangaGroup> categories);
         void onError(String error);
     }
-    public void fetchMangaFromHomePage(OnCategoriesLoadedListener listener) {
+    public void fetchMangaFromHomePage(OnHomePageLoadedListener listener) {
         new Thread(() -> {
             try {
                 // 直接連接更新頁面
                 Document doc = Jsoup.connect("https://tw.manhuagui.com/")
-                        .userAgent("Mozilla/5.0")
+                        .userAgent("Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 Chrome/120.0.0.0 Safari/537.36")
+                        .referrer("https://www.google.com/")
+                        .header("Accept-Language", "zh-TW,zh;q=0.9")
+                        .header("Connection", "keep-alive")
+                        .timeout(15000)
                         .get();
-
+                Random random = new Random();
                 List<MangaGroup> mangaGroupList = new ArrayList<>();
 
                 Elements tags = doc.select("#cmt-tab li");
@@ -70,6 +75,8 @@ public class HomeRepository {
                             bookList.add(new Book(title, imgUrl, pageUrl));
                             Log.d("bookList", String.valueOf(bookList.size()));
                         }
+                        int delay = 1000 + random.nextInt(2000);
+                        Thread.sleep(delay);
                     }
 
                     mangaGroupList.add(new MangaGroup(tag, bookList));
@@ -81,6 +88,8 @@ public class HomeRepository {
             } catch (IOException e) {
                 e.printStackTrace();
                 listener.onError("資料抓取失敗: " + e.getMessage());
+            } catch (InterruptedException e) {
+                throw new RuntimeException(e);
             }
         }).start();
     }
