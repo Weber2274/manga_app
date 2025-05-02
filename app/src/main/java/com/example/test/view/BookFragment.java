@@ -66,7 +66,6 @@ public class BookFragment extends Fragment {
         viewModel = new ViewModelProvider(this).get(BookViewModel.class);
         viewModel.getBooks().observe(getViewLifecycleOwner(), adapter::setBooks);
 
-        // ⚠️ 在這裡填入你的帳號密碼
         viewModel.loadBooks("", "");
 
 
