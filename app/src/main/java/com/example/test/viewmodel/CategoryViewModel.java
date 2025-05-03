@@ -26,15 +26,21 @@ public class CategoryViewModel extends ViewModel {
     public LiveData<String> getError() {
         return errorLiveData;
     }
+    private boolean isLoading = false;
     public void loadCategories(String url){
+        if (isLoading) return;
+        isLoading = true;
+        mangaListLiveData.postValue(null);
         categoryRepository.fetchMangaFromCategoryPage(url, new CategoryRepository.OnCategoryLoadedListener() {
             @Override
             public void onSuccess(List<MangaItem> mangaItems) {
+                isLoading = false;
                 mangaListLiveData.postValue(mangaItems);
             }
 
             @Override
             public void onError(String error) {
+                isLoading = false;
                 errorLiveData.postValue(error);
             }
         });

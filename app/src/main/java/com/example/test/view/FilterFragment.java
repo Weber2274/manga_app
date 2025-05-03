@@ -1,14 +1,25 @@
 package com.example.test.view;
 
+import android.annotation.SuppressLint;
 import android.os.Bundle;
 
 import androidx.fragment.app.Fragment;
+import androidx.lifecycle.ViewModelProvider;
+import androidx.recyclerview.widget.GridLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.TableLayout;
 
 import com.example.test.R;
+import com.example.test.adapter.CategoryAdapter;
+import com.example.test.viewmodel.CategoryViewModel;
+import com.google.android.material.tabs.TabLayout;
+
+import java.util.ArrayList;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -56,11 +67,60 @@ public class FilterFragment extends Fragment {
             mParam2 = getArguments().getString(ARG_PARAM2);
         }
     }
-
+    private CategoryViewModel viewModel;
+    private CategoryAdapter adapter;
+    private RecyclerView recyclerView;
+    private TabLayout tabLayout;
+    private final String rexueUrl = "https://tw.manhuagui.com/list/japan_rexue_lianzai/view.html";
+    private final String aiqingUrl = "https://tw.manhuagui.com/list/japan_aiqing_lianzai/view.html";
+    private final String maoxianUrl = "https://tw.manhuagui.com/list/japan_maoxian_lianzai/view.html";
+    @SuppressLint("MissingInflatedId")
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_filter, container, false);
+        View view = inflater.inflate(R.layout.fragment_filter, container, false);
+        recyclerView = view.findViewById(R.id.recycleview_category);
+        tabLayout = view.findViewById(R.id.category_tablayout);
+        adapter = new CategoryAdapter();
+        recyclerView.setAdapter(adapter);
+        recyclerView.setLayoutManager(new GridLayoutManager(getContext(), 3));
+        viewModel = new ViewModelProvider(this).get(CategoryViewModel.class);
+        viewModel.loadCategories(rexueUrl);
+        viewModel.getCategory().observe(getViewLifecycleOwner(), mangaItems -> {
+            if (mangaItems != null) {
+                Log.d("FilterFragment", "Items loaded: " + mangaItems.size());
+                adapter.setMangas(mangaItems);
+            } else {
+                Log.d("FilterFragment", "No items loaded");
+                adapter.setMangas(new ArrayList<>());
+            }
+        });
+        tabLayout.addOnTabSelectedListener(new TabLayout.OnTabSelectedListener() {
+            @Override
+            public void onTabSelected(TabLayout.Tab tab) {
+                String category = tab.getText().toString();
+                adapter.setMangas(new ArrayList<>());
+                if(category.equals("熱血")){
+                    viewModel.loadCategories(rexueUrl);
+                }else if(category.equals("愛情")){
+                    viewModel.loadCategories(aiqingUrl);
+                }else if(category.equals("冒險")){
+                    viewModel.loadCategories(maoxianUrl);
+                }
+            }
+
+            @Override
+            public void onTabUnselected(TabLayout.Tab tab) {
+
+            }
+
+            @Override
+            public void onTabReselected(TabLayout.Tab tab) {
+
+            }
+        });
+        return view;
+
     }
 }

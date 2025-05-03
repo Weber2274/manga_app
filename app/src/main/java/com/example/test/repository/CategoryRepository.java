@@ -34,21 +34,24 @@ public class CategoryRepository {
 
                Random random = new Random();
                List<MangaItem> mangaItemList = new ArrayList<>();
-               Elements mangas = document.select(".bool-list li");
+               Elements mangas = document.select("div.book-list ul#contList > li");
                for (Element element : mangas) {
-                   String title = element.select("a").attr("title");
-                   String imgUrl = element.select("img").attr("src");
+                   String title = element.select("a.bcover").attr("title");
+                   String imgUrl = element.select("a.bcover img").attr("data-src");
 
+                   if (imgUrl == null || imgUrl.isEmpty()) {
+                       imgUrl = element.select("a.bcover img").attr("src");
+                   }
                    if (!imgUrl.startsWith("http")) {
                        imgUrl = "https:" + imgUrl;
                    }
-                   Log.d("imgUrl", imgUrl);
-                   String href = element.select("a").attr("href");
+                   //Log.d("imgUrl", imgUrl);
+                   String href = element.select("a.bcover").attr("href");
                    String pageUrl = "https://tw.manhuagui.com" + href;
 
                    mangaItemList.add(new MangaItem(title, imgUrl, pageUrl));
-                   Log.d("bookList", String.valueOf(mangaItemList.size()));
-                   int delay = 1000 + random.nextInt(2000);
+                   Log.d("CategoryRepository", imgUrl);
+                   int delay = 1000 + random.nextInt(1000);
                    Thread.sleep(delay);
                }
                listener.onSuccess(mangaItemList);
