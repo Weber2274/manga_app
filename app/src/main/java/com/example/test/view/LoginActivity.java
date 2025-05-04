@@ -1,5 +1,7 @@
 package com.example.test.view;
 
+import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
@@ -27,14 +29,14 @@ public class LoginActivity extends AppCompatActivity {
     private EditText et_name;
     private EditText et_pass;
     private Button btn_login;
-    public String userName;
-    public String passWord;
+    private int targetFragmentId;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         EdgeToEdge.enable(this);
         setContentView(R.layout.activity_login);
+
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main), (v, insets) -> {
             Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
@@ -45,56 +47,60 @@ public class LoginActivity extends AppCompatActivity {
         et_pass = findViewById(R.id.et_password);
         btn_login = findViewById(R.id.btnL_login);
 
-        btn_login.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                userName = et_name.getText().toString();
-                passWord = et_pass.getText().toString();
+        // 接收目標 fragment ID
+        targetFragmentId = getIntent().getIntExtra("target", R.id.nav_home);
 
-                if (!userName.isEmpty() && !passWord.isEmpty()) {
-                    // 發送登入請求
-                    login(userName, passWord);
-                } else {
-                    Toast.makeText(LoginActivity.this, "請填寫帳號和密碼", Toast.LENGTH_SHORT).show();
-                }
+        btn_login.setOnClickListener(v -> {
+            String userName = et_name.getText().toString();
+            String passWord = et_pass.getText().toString();
+
+            if (!userName.isEmpty() && !passWord.isEmpty()) {
+                login(userName, passWord);
+            } else {
+                Toast.makeText(LoginActivity.this, "請填寫帳號和密碼", Toast.LENGTH_SHORT).show();
             }
         });
     }
 
-    private void login(final String username, final String password) {
+    private void login(String username, String password) {
         OkHttpClient client = new OkHttpClient();
 
-        // 使用 FormBody.Builder 設定 POST 請求的參數
         RequestBody body = new FormBody.Builder()
-                .add("username", username)  // 傳送用戶名
-                .add("password", password)  // 傳送密碼
+                .add("username", username)
+                .add("password", password)
                 .build();
 
-        // 創建 Request 物件，並設置請求的 URL 和方法
         Request request = new Request.Builder()
-                .url("https://tw.manhuagui.com/user/login")  // 替換為登入的 URL
-                .post(body)  // POST 請求
+                .url("https://tw.manhuagui.com/user/login") // 實際可能不接受 POST，請視需求更改
+                .post(body)
                 .build();
 
-        // 發送請求並處理回應
         client.newCall(request).enqueue(new okhttp3.Callback() {
             @Override
             public void onFailure(okhttp3.Call call, IOException e) {
-                // 請求失敗時的處理
-                e.printStackTrace();
-                // 顯示錯誤提示或其他處理邏輯
+                runOnUiThread(() ->
+                        Toast.makeText(LoginActivity.this, "登入失敗，請檢查網路", Toast.LENGTH_SHORT).show()
+                );
             }
 
             @Override
-            public void onResponse(okhttp3.Call call, okhttp3.Response response) throws IOException {
+            public void onResponse(okhttp3.Call call, Response response) throws IOException {
                 if (response.isSuccessful()) {
-                    String responseData = response.body() != null ? response.body().string() : "無回應內容";
-                    Log.d("login", "登入成功: ");
+                    // 儲存登入狀態
+                    SharedPreferences prefs = getSharedPreferences("Myprefs", MODE_PRIVATE);
+                    SharedPreferences.Editor editor = prefs.edit();
+                    editor.putBoolean("isLogin", true);
+                    editor.apply();
+
+                    // 回傳成功並附帶 target fragment ID
+                    Intent resultIntent = new Intent();
+                    resultIntent.putExtra("target", targetFragmentId);
+                    setResult(RESULT_OK, resultIntent);
+                    finish();
                 } else {
-                    Log.d("login", "登入失敗: ");
-                    System.out.println("登入失敗，狀態碼: " + response.code());
-                    String errorBody = response.body() != null ? response.body().string() : "無錯誤訊息";
-                    System.out.println("錯誤訊息: " + errorBody);
+                    runOnUiThread(() ->
+                            Toast.makeText(LoginActivity.this, "帳號或密碼錯誤", Toast.LENGTH_SHORT).show()
+                    );
                 }
             }
         });

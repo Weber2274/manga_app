@@ -21,7 +21,7 @@ public class HomeViewModel extends ViewModel {
     private HomeRepository homeRepository;
     private MutableLiveData<String> errorLiveData;
     public HomeViewModel() {
-        homeRepository = new HomeRepository();
+//        homeRepository = new HomeRepository();
         flatListLiveData = new MutableLiveData<>();
         errorLiveData = new MutableLiveData<>();
     }
@@ -33,7 +33,7 @@ public class HomeViewModel extends ViewModel {
     }
 
     public void loadMangas() {
-        homeRepository.fetchMangaFromHomePage(new HomeRepository.OnHomePageLoadedListener() {
+        HomeRepository.getInstance().fetchMangaFromHomePage(new HomeRepository.OnHomePageLoadedListener() {
             @Override
             public void onSuccess(List<MangaGroup> categories) {
                 List<ItemList> flatList = new ArrayList<>();

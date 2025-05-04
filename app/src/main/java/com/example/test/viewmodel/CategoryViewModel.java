@@ -16,7 +16,7 @@ public class CategoryViewModel extends ViewModel {
     private CategoryRepository categoryRepository;
     private MutableLiveData<String> errorLiveData;
     public CategoryViewModel() {
-        categoryRepository = new CategoryRepository();
+        categoryRepository = CategoryRepository.getInstance();
         mangaListLiveData = new MutableLiveData<>();
         errorLiveData = new MutableLiveData<>();
     }

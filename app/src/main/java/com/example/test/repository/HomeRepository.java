@@ -16,11 +16,27 @@ import java.util.List;
 import java.util.Random;
 
 public class HomeRepository {
+    private static HomeRepository instance;
+    private HomeRepository() {}  // 私有建構子
+    public static HomeRepository getInstance() {
+        if (instance == null) {
+            instance = new HomeRepository();
+        }
+        return instance;
+    }
+    private static final long CACHE_DURATION = 5 * 60 * 1000; // 5分鐘
+    private long lastFetchTime = 0;
+    private List<MangaGroup> cachedMangaGroups = null;
     public interface OnHomePageLoadedListener {
         void onSuccess(List<MangaGroup> categories);
         void onError(String error);
     }
     public void fetchMangaFromHomePage(OnHomePageLoadedListener listener) {
+        long now = System.currentTimeMillis();
+        if (cachedMangaGroups != null && now - lastFetchTime < CACHE_DURATION) {
+            listener.onSuccess(cachedMangaGroups);
+            return;
+        }
         new Thread(() -> {
             try {
                 // 直接連接更新頁面
@@ -82,7 +98,9 @@ public class HomeRepository {
                     mangaGroupList.add(new MangaGroup(tag, bookList));
                 }
                 Log.d("MangaGroup", String.valueOf(mangaGroupList.size()));
-                listener.onSuccess(mangaGroupList);
+                lastFetchTime = now;
+                cachedMangaGroups = mangaGroupList;
+                listener.onSuccess(cachedMangaGroups);
 
 
             } catch (IOException e) {
