@@ -1,108 +1,96 @@
 package com.example.test.view;
 
+import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
-import android.util.Log;
-import android.view.View;
-import android.widget.Button;
-import android.widget.EditText;
+import android.webkit.CookieManager;
+import android.webkit.CookieSyncManager;
+import android.webkit.WebView;
+import android.webkit.WebViewClient;
 import android.widget.Toast;
 
-import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.graphics.Insets;
-import androidx.core.view.ViewCompat;
-import androidx.core.view.WindowInsetsCompat;
 
 import com.example.test.R;
 
-import java.io.IOException;
-
-import okhttp3.FormBody;
-import okhttp3.OkHttpClient;
-import okhttp3.Request;
-import okhttp3.RequestBody;
-import okhttp3.Response;
-
 public class LoginActivity extends AppCompatActivity {
-    private EditText et_name;
-    private EditText et_pass;
-    private Button btn_login;
+
+    private WebView webView;
     private int targetFragmentId;
 
+    @SuppressLint("SetJavaScriptEnabled")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        EdgeToEdge.enable(this);
         setContentView(R.layout.activity_login);
 
-        ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main), (v, insets) -> {
-            Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
-            v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
-            return insets;
-        });
-
-        et_name = findViewById(R.id.et_username);
-        et_pass = findViewById(R.id.et_password);
-        btn_login = findViewById(R.id.btnL_login);
-
-        // 接收目標 fragment ID
+        webView = findViewById(R.id.webview);
         targetFragmentId = getIntent().getIntExtra("target", R.id.nav_home);
 
-        btn_login.setOnClickListener(v -> {
-            String userName = et_name.getText().toString();
-            String passWord = et_pass.getText().toString();
+        webView.getSettings().setJavaScriptEnabled(true);
+        webView.getSettings().setJavaScriptEnabled(true);
+        webView.getSettings().setUseWideViewPort(true);
+        webView.getSettings().setLoadWithOverviewMode(true);
+        webView.setWebViewClient(new WebViewClient() {
+            @Override
+            public void onPageFinished(WebView view, String url) {
+                super.onPageFinished(view, url);
 
-            if (!userName.isEmpty() && !passWord.isEmpty()) {
-                login(userName, passWord);
-            } else {
-                Toast.makeText(LoginActivity.this, "請填寫帳號和密碼", Toast.LENGTH_SHORT).show();
+                if (url.contains("/user/login/center")) {
+                    // 等待跳轉後的頁面，如 /user/center 表示已登入成功
+                    String cookie = CookieManager.getInstance().getCookie(url);
+                    saveLoginStatus(cookie);
+                }
+
+                String js = "javascript:(function() {"
+                        + "var head = document.getElementsByTagName('head')[0];"
+                        + "var viewport = document.createElement('meta');"
+                        + "viewport.name = 'viewport';"
+                        + "viewport.content = 'width=device-width, initial-scale=1.0';"
+                        + "head.appendChild(viewport);"
+
+                        // 更安全的隱藏方式（只隱藏body的直接子元素）
+                        + "var bodyChildren = document.body.children;"
+                        + "for (var i = 0; i < bodyChildren.length; i++) {"
+                        + "    var child = bodyChildren[i];"
+                        + "    if (!child.contains(document.querySelector('.login-right'))) {"
+                        + "        child.style.display = 'none';"
+                        + "    }"
+                        + "}"
+
+                        // 移動登錄框到body的直接子級（確保定位基準）
+                        + "var loginBox = document.querySelector('.login-right');"
+                        + "if (loginBox) {"
+                        + "    document.body.appendChild(loginBox);"
+                        + "    loginBox.style.cssText = '"
+                        + "display: block !important; "
+                        + "position: fixed !important; "
+                        + "top: 50% !important; "
+                        + "left: 50% !important; "
+                        + "transform: translate(-50%, -50%) !important; "
+                        + "width: 90% !important; "
+                        + "max-width: 400px !important; "
+                        + "padding: 20px !important; "
+                        + "background: white !important; "
+                        + "z-index: 9999 !important;"
+                        + "';"
+                        + "    document.body.style.background = 'white';"
+                        + "    document.body.style.overflow = 'hidden';"
+                        + "}"
+                        + "})();";
+
+                view.evaluateJavascript(js, null);
             }
         });
+        webView.loadUrl("https://tw.manhuagui.com/user/login");
     }
 
-    private void login(String username, String password) {
-        OkHttpClient client = new OkHttpClient();
-
-        RequestBody body = new FormBody.Builder()
-                .add("username", username)
-                .add("password", password)
-                .build();
-
-        Request request = new Request.Builder()
-                .url("https://tw.manhuagui.com/user/login") // 實際可能不接受 POST，請視需求更改
-                .post(body)
-                .build();
-
-        client.newCall(request).enqueue(new okhttp3.Callback() {
-            @Override
-            public void onFailure(okhttp3.Call call, IOException e) {
-                runOnUiThread(() ->
-                        Toast.makeText(LoginActivity.this, "登入失敗，請檢查網路", Toast.LENGTH_SHORT).show()
-                );
-            }
-
-            @Override
-            public void onResponse(okhttp3.Call call, Response response) throws IOException {
-                if (response.isSuccessful()) {
-                    // 儲存登入狀態
-                    SharedPreferences prefs = getSharedPreferences("Myprefs", MODE_PRIVATE);
-                    SharedPreferences.Editor editor = prefs.edit();
-                    editor.putBoolean("isLogin", true);
-                    editor.apply();
-
-                    // 回傳成功並附帶 target fragment ID
-                    Intent resultIntent = new Intent();
-                    resultIntent.putExtra("target", targetFragmentId);
-                    setResult(RESULT_OK, resultIntent);
-                    finish();
-                } else {
-                    runOnUiThread(() ->
-                            Toast.makeText(LoginActivity.this, "帳號或密碼錯誤", Toast.LENGTH_SHORT).show()
-                    );
-                }
-            }
-        });
+    private void saveLoginStatus(String cookie) {
+        SharedPreferences prefs = getSharedPreferences("Myprefs", MODE_PRIVATE);
+        SharedPreferences.Editor editor = prefs.edit();
+        editor.putBoolean("isLogin", true);
+        editor.putString("cookie", cookie);
+        editor.apply();
     }
 }

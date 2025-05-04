@@ -39,7 +39,6 @@ public class HomeRepository {
         }
         new Thread(() -> {
             try {
-                // 直接連接更新頁面
                 Document doc = Jsoup.connect("https://tw.manhuagui.com/")
                         .userAgent("Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 Chrome/120.0.0.0 Safari/537.36")
                         .referrer("https://www.google.com/")
