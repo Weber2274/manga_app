@@ -52,7 +52,7 @@ public class CategoryRepository {
                         .get();
 
                 List<MangaItem> mangaItemList = new ArrayList<>();
-                Elements mangas = document.select("div.dy_content.autoHeight div.dy_content_li");
+                Elements mangas = document.select("div.book-list ul#contList > li");
 
                 for (Element element : mangas) {
                     String title = element.select("a.bcover").attr("title");

@@ -93,4 +93,5 @@ public class LoginActivity extends AppCompatActivity {
         editor.putString("cookie", cookie);
         editor.apply();
     }
+
 }
