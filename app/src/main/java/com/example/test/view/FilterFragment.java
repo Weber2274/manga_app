@@ -12,6 +12,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ProgressBar;
 import android.widget.TableLayout;
 
 import com.example.test.R;
@@ -71,6 +72,7 @@ public class FilterFragment extends Fragment {
     private CategoryAdapter adapter;
     private RecyclerView recyclerView;
     private TabLayout tabLayout;
+    private ProgressBar progressBar;
     private final String rexueUrl = "https://tw.manhuagui.com/list/japan_rexue_lianzai/view.html";
     private final String aiqingUrl = "https://tw.manhuagui.com/list/japan_aiqing_lianzai/view.html";
     private final String maoxianUrl = "https://tw.manhuagui.com/list/japan_maoxian_lianzai/view.html";
@@ -82,6 +84,7 @@ public class FilterFragment extends Fragment {
         View view = inflater.inflate(R.layout.fragment_filter, container, false);
         recyclerView = view.findViewById(R.id.recycleview_category);
         tabLayout = view.findViewById(R.id.category_tablayout);
+        progressBar = view.findViewById(R.id.progressBar);
         adapter = new CategoryAdapter();
         recyclerView.setAdapter(adapter);
         recyclerView.setLayoutManager(new GridLayoutManager(getContext(), 3));
@@ -96,6 +99,14 @@ public class FilterFragment extends Fragment {
                 adapter.setMangas(new ArrayList<>());
             }
         });
+        viewModel.getLoading().observe(getViewLifecycleOwner(), isLoading -> {
+            if (isLoading) {
+                progressBar.setVisibility(View.VISIBLE);
+            } else {
+                progressBar.setVisibility(View.GONE);
+            }
+        });
+
         tabLayout.addOnTabSelectedListener(new TabLayout.OnTabSelectedListener() {
             @Override
             public void onTabSelected(TabLayout.Tab tab) {

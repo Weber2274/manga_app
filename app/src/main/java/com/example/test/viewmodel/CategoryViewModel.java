@@ -15,6 +15,10 @@ public class CategoryViewModel extends ViewModel {
     private MutableLiveData<List<MangaItem>> mangaListLiveData;
     private CategoryRepository categoryRepository;
     private MutableLiveData<String> errorLiveData;
+    private MutableLiveData<Boolean> loadingLiveData = new MutableLiveData<>();
+    public LiveData<Boolean> getLoading() {
+        return loadingLiveData;
+    }
     public CategoryViewModel() {
         categoryRepository = CategoryRepository.getInstance();
         mangaListLiveData = new MutableLiveData<>();
@@ -30,17 +34,20 @@ public class CategoryViewModel extends ViewModel {
     public void loadCategories(String url){
         if (isLoading) return;
         isLoading = true;
+        loadingLiveData.postValue(true); // 開始載入
         mangaListLiveData.postValue(null);
         categoryRepository.fetchMangaFromCategoryPage(url, new CategoryRepository.OnCategoryLoadedListener() {
             @Override
             public void onSuccess(List<MangaItem> mangaItems) {
                 isLoading = false;
+                loadingLiveData.postValue(false);
                 mangaListLiveData.postValue(mangaItems);
             }
 
             @Override
             public void onError(String error) {
                 isLoading = false;
+                loadingLiveData.postValue(false);
                 errorLiveData.postValue(error);
             }
         });
