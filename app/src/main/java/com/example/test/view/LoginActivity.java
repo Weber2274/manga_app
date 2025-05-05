@@ -4,6 +4,8 @@ import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.os.Handler;
+import android.util.Log;
 import android.webkit.CookieManager;
 import android.webkit.CookieSyncManager;
 import android.webkit.WebView;
@@ -12,6 +14,7 @@ import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.example.test.MainActivity;
 import com.example.test.R;
 
 public class LoginActivity extends AppCompatActivity {
@@ -29,19 +32,25 @@ public class LoginActivity extends AppCompatActivity {
         targetFragmentId = getIntent().getIntExtra("target", R.id.nav_home);
 
         webView.getSettings().setJavaScriptEnabled(true);
-        webView.getSettings().setJavaScriptEnabled(true);
         webView.getSettings().setUseWideViewPort(true);
         webView.getSettings().setLoadWithOverviewMode(true);
+
         webView.setWebViewClient(new WebViewClient() {
             @Override
             public void onPageFinished(WebView view, String url) {
                 super.onPageFinished(view, url);
 
-                if (url.contains("/user/login/center")) {
-                    // 等待跳轉後的頁面，如 /user/center 表示已登入成功
+                new Handler().postDelayed(() -> {
                     String cookie = CookieManager.getInstance().getCookie(url);
-                    saveLoginStatus(cookie);
-                }
+                    Log.d("LoginActivity_cookie", "獲取的 cookie: " + cookie);
+
+                    if (cookie != null && cookie.contains("ASP.NET_SessionId")) {
+                        saveLoginStatus(cookie);
+                        Intent intent = new Intent(LoginActivity.this, MainActivity.class);
+                        startActivity(intent);
+                        finish();
+                    }
+                }, 2000);
 
                 String js = "javascript:(function() {"
                         + "var head = document.getElementsByTagName('head')[0];"
@@ -50,7 +59,6 @@ public class LoginActivity extends AppCompatActivity {
                         + "viewport.content = 'width=device-width, initial-scale=1.0';"
                         + "head.appendChild(viewport);"
 
-                        // 更安全的隱藏方式（只隱藏body的直接子元素）
                         + "var bodyChildren = document.body.children;"
                         + "for (var i = 0; i < bodyChildren.length; i++) {"
                         + "    var child = bodyChildren[i];"
@@ -59,7 +67,6 @@ public class LoginActivity extends AppCompatActivity {
                         + "    }"
                         + "}"
 
-                        // 移動登錄框到body的直接子級（確保定位基準）
                         + "var loginBox = document.querySelector('.login-right');"
                         + "if (loginBox) {"
                         + "    document.body.appendChild(loginBox);"
@@ -77,16 +84,19 @@ public class LoginActivity extends AppCompatActivity {
                         + "';"
                         + "    document.body.style.background = 'white';"
                         + "    document.body.style.overflow = 'hidden';"
-                        + "}"
+                        + "} "
                         + "})();";
 
                 view.evaluateJavascript(js, null);
             }
         });
+
         webView.loadUrl("https://tw.manhuagui.com/user/login");
     }
 
+
     private void saveLoginStatus(String cookie) {
+        Log.d("LoginActivity_cookie", "保存 cookie: " + cookie);
         SharedPreferences prefs = getSharedPreferences("Myprefs", MODE_PRIVATE);
         SharedPreferences.Editor editor = prefs.edit();
         editor.putBoolean("isLogin", true);

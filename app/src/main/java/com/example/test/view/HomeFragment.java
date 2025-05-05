@@ -1,6 +1,10 @@
 package com.example.test.view;
 
+import static android.content.Context.MODE_PRIVATE;
+
+import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 
 import androidx.fragment.app.Fragment;
@@ -16,6 +20,7 @@ import android.widget.Button;
 
 import com.example.test.R;
 import com.example.test.adapter.HomeAdapter;
+import com.example.test.model.SessionManager;
 import com.example.test.viewmodel.HomeViewModel;
 
 /**
@@ -77,8 +82,19 @@ public class HomeFragment extends Fragment {
         btnLogin.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Intent intent = new Intent(requireActivity(), LoginActivity.class);
-                startActivity(intent);
+                SharedPreferences prefs = requireActivity().getSharedPreferences("Myprefs", Context.MODE_PRIVATE);
+                SharedPreferences.Editor editor = prefs.edit();
+                boolean isLogin = prefs.getBoolean("isLogin", false);
+
+                if (!isLogin) {
+                    updateLoginButton();
+                    Intent intent = new Intent(requireActivity(), LoginActivity.class);
+                    startActivity(intent);
+                } else {
+                    SessionManager.logout(requireContext());
+                    updateLoginButton();
+
+                }
             }
         });
         recyclerView = view.findViewById(R.id.home_recyclerView);
@@ -106,8 +122,22 @@ public class HomeFragment extends Fragment {
                 adapter.setItems(items);
             }
         });
-
-
         return view;
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        updateLoginButton();
+    }
+
+    private void updateLoginButton() {
+        SharedPreferences prefs = requireActivity().getSharedPreferences("Myprefs", MODE_PRIVATE);
+        boolean isLogin = prefs.getBoolean("isLogin", false);
+        if (isLogin) {
+            btnLogin.setText("登出");
+        } else {
+            btnLogin.setText("登入");
+        }
     }
 }
