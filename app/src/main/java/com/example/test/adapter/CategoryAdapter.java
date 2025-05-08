@@ -22,6 +22,7 @@ import java.util.List;
 public class CategoryAdapter extends RecyclerView.Adapter<CategoryAdapter.CategoryViewHolder>{
 
     private List<MangaItem> mangaItems = new ArrayList<>();
+    
     @SuppressLint("NotifyDataSetChanged")
     public void setMangas(List<MangaItem> mangaItems) {
         this.mangaItems = mangaItems;
