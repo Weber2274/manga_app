@@ -22,7 +22,14 @@ import java.util.List;
 public class CategoryAdapter extends RecyclerView.Adapter<CategoryAdapter.CategoryViewHolder>{
 
     private List<MangaItem> mangaItems = new ArrayList<>();
-    
+    public interface OnItemClickListener{
+        void onItemClick(MangaItem item);
+    }
+    private OnItemClickListener listener;
+
+    public void setOnItemClickListener(OnItemClickListener listener) {
+        this.listener = listener;
+    }
     @SuppressLint("NotifyDataSetChanged")
     public void setMangas(List<MangaItem> mangaItems) {
         this.mangaItems = mangaItems;
@@ -41,6 +48,11 @@ public class CategoryAdapter extends RecyclerView.Adapter<CategoryAdapter.Catego
         MangaItem mangaItem = mangaItems.get(position);
         holder.title.setText(mangaItem.getTitle());
         Glide.with(holder.itemView.getContext()).load(mangaItem.getImgUrl()).into(holder.cover);
+        holder.itemView.setOnClickListener(view -> {
+            if(listener != null){
+                listener.onItemClick(mangaItem);
+            }
+        });
     }
 
     @Override

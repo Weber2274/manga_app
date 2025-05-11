@@ -1,6 +1,7 @@
 package com.example.test.view;
 
 import android.annotation.SuppressLint;
+import android.content.Intent;
 import android.os.Bundle;
 
 import androidx.fragment.app.Fragment;
@@ -17,6 +18,7 @@ import android.widget.TableLayout;
 
 import com.example.test.R;
 import com.example.test.adapter.CategoryAdapter;
+import com.example.test.model.MangaItem;
 import com.example.test.viewmodel.CategoryViewModel;
 import com.google.android.material.tabs.TabLayout;
 
@@ -106,7 +108,11 @@ public class FilterFragment extends Fragment {
                 progressBar.setVisibility(View.GONE);
             }
         });
-
+        adapter.setOnItemClickListener(item -> {
+            Intent intent = new Intent(requireActivity(), MangaDetailActivity.class);
+            intent.putExtra("pageUrl",item.getPageUrl());
+            startActivity(intent);
+        });
         tabLayout.addOnTabSelectedListener(new TabLayout.OnTabSelectedListener() {
             @Override
             public void onTabSelected(TabLayout.Tab tab) {

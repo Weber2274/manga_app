@@ -26,6 +26,14 @@ public class HomeAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
     public static final int TYPE_CATEGORY = 1;
     public static final int TYPE_MANGA = 2;
 
+    public interface OnItemClickListener{
+        void onItemClick(MangaItem item);
+    }
+    private CategoryAdapter.OnItemClickListener listener;
+
+    public void setOnItemClickListener(CategoryAdapter.OnItemClickListener listener) {
+        this.listener = listener;
+    }
     @SuppressLint("NotifyDataSetChanged")
     public void setItems(List<ItemList> items) {
         this.items = items;
@@ -61,6 +69,11 @@ public class HomeAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
             Glide.with(holder.itemView.getContext())
                     .load(manga.getImgUrl())
                     .into(((MangaViewHolder)holder).imgCover);
+            holder.itemView.setOnClickListener(view -> {
+                if(listener != null){
+                    listener.onItemClick(manga);
+                }
+            });
         }
     }
 

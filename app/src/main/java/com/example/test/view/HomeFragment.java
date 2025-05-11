@@ -19,7 +19,9 @@ import android.view.ViewGroup;
 import android.widget.Button;
 
 import com.example.test.R;
+import com.example.test.adapter.CategoryAdapter;
 import com.example.test.adapter.HomeAdapter;
+import com.example.test.model.MangaItem;
 import com.example.test.model.SessionManager;
 import com.example.test.viewmodel.HomeViewModel;
 
@@ -121,6 +123,11 @@ public class HomeFragment extends Fragment {
                 Log.d("HomeFragment", "Items loaded: " + items.size());
                 adapter.setItems(items);
             }
+        });
+        adapter.setOnItemClickListener(item -> {
+            Intent intent = new Intent(requireActivity(), MangaDetailActivity.class);
+            intent.putExtra("pageUrl",item.getPageUrl());
+            startActivity(intent);
         });
         return view;
     }
