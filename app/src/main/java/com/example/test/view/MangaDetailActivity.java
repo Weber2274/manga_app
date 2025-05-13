@@ -6,6 +6,7 @@ import android.view.View;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
+import androidx.appcompat.widget.Toolbar;
 
 import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
@@ -16,13 +17,13 @@ import androidx.lifecycle.ViewModelProvider;
 
 import com.bumptech.glide.Glide;
 import com.example.test.R;
-import com.example.test.model.MangaDetail;
 import com.example.test.viewmodel.MangaDetailViewModel;
 
 public class MangaDetailActivity extends AppCompatActivity {
     private ImageView imgCover;
     private TextView title,author,region,year,status;
     private ProgressBar progressBar;
+    private Toolbar toolbar;
     @SuppressLint({"SetTextI18n", "MissingInflatedId"})
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -60,6 +61,11 @@ public class MangaDetailActivity extends AppCompatActivity {
                 year.setText("出品年代: " + mangaDetail.getYear());
                 status.setText("作品狀態: " + mangaDetail.getStatus());
             }
+        });
+        toolbar = findViewById(R.id.detail_toolbar);
+        setSupportActionBar(toolbar);
+        toolbar.setNavigationOnClickListener(v -> {
+            finish();
         });
     }
 }

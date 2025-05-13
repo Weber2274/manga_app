@@ -8,7 +8,7 @@
     tools:context=".view.MangaDetailActivity" >
 
     <androidx.appcompat.widget.Toolbar
-        android:id="@+id/detail_toobar"
+        android:id="@+id/detail_toolbar"
         android:layout_width="412dp"
         android:layout_height="wrap_content"
         android:background="?attr/colorPrimary"
@@ -28,7 +28,7 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/detail_toobar" />
+        app:layout_constraintTop_toBottomOf="@+id/detail_toolbar" />
 
     <androidx.core.widget.NestedScrollView
         android:id="@+id/detail_nestedscrollview"
@@ -38,7 +38,7 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/detail_toobar">
+        app:layout_constraintTop_toBottomOf="@+id/detail_toolbar">
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -54,15 +54,17 @@
                 <ImageView
                     android:id="@+id/detail_cover"
                     android:layout_width="162dp"
-                    android:layout_height="209dp"
+                    android:layout_height="222dp"
                     android:layout_marginLeft="12dp"
-                    android:layout_marginTop="12dp" />
+                    android:layout_marginTop="12dp"
+                    android:layout_marginRight="12dp" />
 
                 <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="209dp"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
                     android:layout_marginTop="12dp"
                     android:layout_marginRight="12dp"
+                    android:layout_weight="1"
                     android:orientation="vertical">
 
                     <TextView
@@ -70,9 +72,9 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_marginLeft="12dp"
-                        android:layout_marginTop="12dp"
                         android:layout_marginRight="12dp"
-                        android:textSize="20sp" />
+                        android:maxLines="3"
+                        android:textSize="18sp" />
 
                     <TextView
                         android:id="@+id/detail_author"
@@ -112,10 +114,6 @@
 
                 </LinearLayout>
             </LinearLayout>
-
-            <androidx.recyclerview.widget.RecyclerView
-                android:layout_width="match_parent"
-                android:layout_height="match_parent" />
 
         </LinearLayout>
     </androidx.core.widget.NestedScrollView>
