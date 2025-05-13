@@ -34,7 +34,7 @@ public class CategoryViewModel extends ViewModel {
     public void loadCategories(String url){
         if (isLoading) return;
         isLoading = true;
-        loadingLiveData.postValue(true); // 開始載入
+        loadingLiveData.postValue(true);
         mangaListLiveData.postValue(null);
         categoryRepository.fetchMangaFromCategoryPage(url, new CategoryRepository.OnCategoryLoadedListener() {
             @Override

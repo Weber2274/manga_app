@@ -35,14 +35,12 @@ public class SessionManager {
         });
         cookieManager.flush();
 
-        // 1. 清除登入狀態
         SharedPreferences prefs = context.getSharedPreferences(PREF_NAME, Context.MODE_PRIVATE);
         SharedPreferences.Editor editor = prefs.edit();
         editor.putBoolean(KEY_IS_LOGIN, false);
         editor.remove(KEY_COOKIE);
         editor.apply();
 
-        // 2. 背景發送登出請求（不顯示頁面）
         OkHttpClient client = new OkHttpClient();
         Request request = new Request.Builder()
                 .url("https://tw.manhuagui.com/user/center/exit")
@@ -61,7 +59,6 @@ public class SessionManager {
             }
         });
 
-        // 3. 回到 MainActivity
         Intent intent = new Intent(context, MainActivity.class);
         intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
         context.startActivity(intent);

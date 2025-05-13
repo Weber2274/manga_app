@@ -20,6 +20,7 @@ import com.example.test.R;
 import com.example.test.adapter.CategoryAdapter;
 import com.example.test.model.MangaItem;
 import com.example.test.viewmodel.CategoryViewModel;
+import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.tabs.TabLayout;
 
 import java.util.ArrayList;
@@ -78,6 +79,7 @@ public class FilterFragment extends Fragment {
     private final String rexueUrl = "https://tw.manhuagui.com/list/japan_rexue_lianzai/view.html";
     private final String aiqingUrl = "https://tw.manhuagui.com/list/japan_aiqing_lianzai/view.html";
     private final String maoxianUrl = "https://tw.manhuagui.com/list/japan_maoxian_lianzai/view.html";
+    private BottomNavigationView bottomNavigationView;
     @SuppressLint("MissingInflatedId")
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -87,6 +89,7 @@ public class FilterFragment extends Fragment {
         recyclerView = view.findViewById(R.id.recycleview_category);
         tabLayout = view.findViewById(R.id.category_tablayout);
         progressBar = view.findViewById(R.id.progressBar);
+        bottomNavigationView = requireActivity().findViewById(R.id.bottomNavigationView);
         adapter = new CategoryAdapter();
         recyclerView.setAdapter(adapter);
         recyclerView.setLayoutManager(new GridLayoutManager(getContext(), 3));
@@ -139,5 +142,23 @@ public class FilterFragment extends Fragment {
         });
         return view;
 
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+
+        Fragment currentFragment = requireActivity().getSupportFragmentManager().findFragmentById(R.id.fragment_main);
+        if (currentFragment instanceof HomeFragment) {
+            bottomNavigationView.setSelectedItemId(R.id.nav_home);
+        } else if (currentFragment instanceof FilterFragment) {
+            bottomNavigationView.setSelectedItemId(R.id.nav_filter);
+        } else if (currentFragment instanceof HistoryFragment) {
+            bottomNavigationView.setSelectedItemId(R.id.nav_history);
+        } else if (currentFragment instanceof LikeFragment) {
+            bottomNavigationView.setSelectedItemId(R.id.nav_like);
+        } else if (currentFragment instanceof SettingFragment) {
+            bottomNavigationView.setSelectedItemId(R.id.nav_setting);
+        }
     }
 }

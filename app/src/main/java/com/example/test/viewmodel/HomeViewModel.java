@@ -18,6 +18,7 @@ import java.util.List;
 
 public class HomeViewModel extends ViewModel {
     private MutableLiveData<List<ItemList>> flatListLiveData;
+    private MutableLiveData<Boolean> isLoading = new MutableLiveData<>();
     private HomeRepository homeRepository;
     private MutableLiveData<String> errorLiveData;
     public HomeViewModel() {
@@ -31,28 +32,31 @@ public class HomeViewModel extends ViewModel {
     public LiveData<String> getError() {
         return errorLiveData;
     }
+    public LiveData<Boolean> getIsLoading() {return isLoading;}
 
     public void loadMangas() {
+        if (Boolean.TRUE.equals(isLoading.getValue())) return;
+
+        isLoading.setValue(true);
         HomeRepository.getInstance().fetchMangaFromHomePage(new HomeRepository.OnHomePageLoadedListener() {
             @Override
             public void onSuccess(List<MangaGroup> categories) {
+                isLoading.postValue(false);
                 List<ItemList> flatList = new ArrayList<>();
-                for(MangaGroup group : categories){
+                for (MangaGroup group : categories) {
                     flatList.add(new CategoryTitleItem(group.getFilter()));
-
-                    for(Book manga : group.getMangaList()){
+                    for (Book manga : group.getMangaList()) {
                         flatList.add(new MangaItem(manga.getTitle(), manga.getImageUrl(), manga.getPageUrl()));
-                        Log.d("HomeViewModel", "取得資料成功，分類數量: " + manga.getImageUrl());
-
+                        Log.d("HomeViewModel", "取得資料成功，圖片網址: " + manga.getImageUrl());
                     }
-
                 }
                 Log.d("HomeViewModel", "總共資料筆數: " + flatList.size());
                 flatListLiveData.postValue(flatList);
-
             }
+
             @Override
             public void onError(String error) {
+                isLoading.postValue(false);
                 errorLiveData.postValue(error);
             }
         });

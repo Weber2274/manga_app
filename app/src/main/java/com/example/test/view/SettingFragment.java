@@ -9,6 +9,7 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.example.test.R;
+import com.google.android.material.bottomnavigation.BottomNavigationView;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -56,11 +57,30 @@ public class SettingFragment extends Fragment {
             mParam2 = getArguments().getString(ARG_PARAM2);
         }
     }
-
+    private BottomNavigationView bottomNavigationView;
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
+        bottomNavigationView = requireActivity().findViewById(R.id.bottomNavigationView);
+
         // Inflate the layout for this fragment
         return inflater.inflate(R.layout.fragment_setting, container, false);
+    }
+    @Override
+    public void onResume() {
+        super.onResume();
+
+        Fragment currentFragment = requireActivity().getSupportFragmentManager().findFragmentById(R.id.fragment_main);
+        if (currentFragment instanceof HomeFragment) {
+            bottomNavigationView.setSelectedItemId(R.id.nav_home);
+        } else if (currentFragment instanceof FilterFragment) {
+            bottomNavigationView.setSelectedItemId(R.id.nav_filter);
+        } else if (currentFragment instanceof HistoryFragment) {
+            bottomNavigationView.setSelectedItemId(R.id.nav_history);
+        } else if (currentFragment instanceof LikeFragment) {
+            bottomNavigationView.setSelectedItemId(R.id.nav_like);
+        } else if (currentFragment instanceof SettingFragment) {
+            bottomNavigationView.setSelectedItemId(R.id.nav_setting);
+        }
     }
 }

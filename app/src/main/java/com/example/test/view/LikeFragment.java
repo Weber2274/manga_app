@@ -1,19 +1,26 @@
 package com.example.test.view;
 
-import static android.content.Context.MODE_PRIVATE;
-
-import android.content.Context;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.os.Bundle;
-
-import androidx.fragment.app.Fragment;
-
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.TextView;
+import androidx.fragment.app.Fragment;
+import androidx.lifecycle.ViewModelProvider;
+import androidx.recyclerview.widget.GridLayoutManager;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
 import com.example.test.R;
+import com.example.test.adapter.LikeAdapter;
+import com.example.test.model.MangaItem;
+import com.example.test.repository.LikeRepository;
+import com.example.test.viewmodel.HomeViewModel;
+import com.example.test.viewmodel.LikeViewModel;
+import java.util.List;
+import com.google.android.material.bottomnavigation.BottomNavigationView;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -21,6 +28,10 @@ import com.example.test.R;
  * create an instance of this fragment.
  */
 public class LikeFragment extends Fragment {
+    private LikeViewModel likeViewModel;
+    private LikeAdapter likeAdapter;
+    private SwipeRefreshLayout swipeRefreshLayout;
+    private TextView textView;
 
     // TODO: Rename parameter arguments, choose names that match
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
@@ -61,10 +72,54 @@ public class LikeFragment extends Fragment {
             mParam2 = getArguments().getString(ARG_PARAM2);
         }
     }
+    private BottomNavigationView bottomNavigationView;
+    @Override
+    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+        View view = inflater.inflate(R.layout.fragment_like, container, false);
+
+        likeViewModel = new ViewModelProvider(this).get(LikeViewModel.class);
+        bottomNavigationView = requireActivity().findViewById(R.id.bottomNavigationView);
+
+        RecyclerView recyclerView = view.findViewById(R.id.like_recycleview);
+        likeAdapter = new LikeAdapter();
+        recyclerView.setLayoutManager(new GridLayoutManager(getContext(), 3));
+        recyclerView.setAdapter(likeAdapter);
+        likeViewModel.loadMangaData(requireContext());
+        likeViewModel.getMangaItems().observe(getViewLifecycleOwner(), mangaItems -> {
+            swipeRefreshLayout.setRefreshing(false);
+            if (mangaItems != null) {
+                likeAdapter.setMangas(mangaItems);
+            }
+        });
+        likeAdapter.setOnItemClickListener(item -> {
+            Intent intent = new Intent(requireActivity(), MangaDetailActivity.class);
+            intent.putExtra("pageUrl",item.getPageUrl());
+            startActivity(intent);
+        });
+        swipeRefreshLayout = view.findViewById(R.id.swipe_refresh);
+
+        swipeRefreshLayout.setOnRefreshListener(() -> {
+            likeViewModel.refreshMangaData(requireContext());  // 強制重新抓取
+        });
+
+        return view;
+    }
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                             Bundle savedInstanceState) {
-        return inflater.inflate(R.layout.fragment_like, container, false);
+    public void onResume() {
+        super.onResume();
+
+        Fragment currentFragment = requireActivity().getSupportFragmentManager().findFragmentById(R.id.fragment_main);
+        if (currentFragment instanceof HomeFragment) {
+            bottomNavigationView.setSelectedItemId(R.id.nav_home);
+        } else if (currentFragment instanceof FilterFragment) {
+            bottomNavigationView.setSelectedItemId(R.id.nav_filter);
+        } else if (currentFragment instanceof HistoryFragment) {
+            bottomNavigationView.setSelectedItemId(R.id.nav_history);
+        } else if (currentFragment instanceof LikeFragment) {
+            bottomNavigationView.setSelectedItemId(R.id.nav_like);
+        } else if (currentFragment instanceof SettingFragment) {
+            bottomNavigationView.setSelectedItemId(R.id.nav_setting);
+        }
     }
 }

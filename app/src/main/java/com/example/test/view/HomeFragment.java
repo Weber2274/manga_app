@@ -17,6 +17,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.ProgressBar;
 
 import com.example.test.R;
 import com.example.test.adapter.CategoryAdapter;
@@ -24,6 +25,7 @@ import com.example.test.adapter.HomeAdapter;
 import com.example.test.model.MangaItem;
 import com.example.test.model.SessionManager;
 import com.example.test.viewmodel.HomeViewModel;
+import com.google.android.material.bottomnavigation.BottomNavigationView;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -74,13 +76,24 @@ public class HomeFragment extends Fragment {
     private RecyclerView recyclerView;
     private HomeAdapter adapter;
     private Button btnLogin;
+    private Button btnHistory;
+    private Button btnLike;
     HomeViewModel viewModel;
+    private ProgressBar loading;
+    private BottomNavigationView bottomNavigationView;
+
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_home, container, false);
         btnLogin = view.findViewById(R.id.login_btn);
+        loading = view.findViewById(R.id.progressBar);
+        btnHistory = view.findViewById(R.id.history_btn);
+        btnLike = view.findViewById(R.id.favorite_btn);
+        bottomNavigationView = requireActivity().findViewById(R.id.bottomNavigationView);
+
+
         btnLogin.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -99,6 +112,21 @@ public class HomeFragment extends Fragment {
                 }
             }
         });
+
+        btnLike.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                setCurrentFragment(LikeFragment.newInstance("",""));
+            }
+        });
+
+        btnHistory.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                setCurrentFragment(HistoryFragment.newInstance("",""));
+            }
+        });
+
         recyclerView = view.findViewById(R.id.home_recyclerView);
         adapter = new HomeAdapter();
         recyclerView.setAdapter(adapter);
@@ -129,6 +157,13 @@ public class HomeFragment extends Fragment {
             intent.putExtra("pageUrl",item.getPageUrl());
             startActivity(intent);
         });
+        viewModel.getIsLoading().observe(getViewLifecycleOwner(), isLoading -> {
+            if (isLoading != null && isLoading) {
+                loading.setVisibility(View.VISIBLE);
+            } else {
+                loading.setVisibility(View.GONE);
+            }
+        });
         return view;
     }
 
@@ -136,6 +171,19 @@ public class HomeFragment extends Fragment {
     public void onResume() {
         super.onResume();
         updateLoginButton();
+
+        Fragment currentFragment = requireActivity().getSupportFragmentManager().findFragmentById(R.id.fragment_main);
+        if (currentFragment instanceof HomeFragment) {
+            bottomNavigationView.setSelectedItemId(R.id.nav_home);
+        } else if (currentFragment instanceof FilterFragment) {
+            bottomNavigationView.setSelectedItemId(R.id.nav_filter);
+        } else if (currentFragment instanceof HistoryFragment) {
+            bottomNavigationView.setSelectedItemId(R.id.nav_history);
+        } else if (currentFragment instanceof LikeFragment) {
+            bottomNavigationView.setSelectedItemId(R.id.nav_like);
+        } else if (currentFragment instanceof SettingFragment) {
+            bottomNavigationView.setSelectedItemId(R.id.nav_setting);
+        }
     }
 
     private void updateLoginButton() {
@@ -146,5 +194,13 @@ public class HomeFragment extends Fragment {
         } else {
             btnLogin.setText("登入");
         }
+    }
+
+    private void setCurrentFragment(Fragment fragment) {
+        requireActivity().getSupportFragmentManager()
+                .beginTransaction()
+                .replace(R.id.fragment_main, fragment)
+                .addToBackStack(null)
+                .commit();
     }
 }
