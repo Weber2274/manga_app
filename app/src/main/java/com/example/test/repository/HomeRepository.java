@@ -90,8 +90,6 @@ public class HomeRepository {
                             bookList.add(new Book(title, imgUrl, pageUrl));
                             Log.d("bookList", String.valueOf(bookList.size()));
                         }
-                        int delay = 1000 + random.nextInt(2000);
-                        Thread.sleep(delay);
                     }
 
                     mangaGroupList.add(new MangaGroup(tag, bookList));
@@ -105,8 +103,6 @@ public class HomeRepository {
             } catch (IOException e) {
                 e.printStackTrace();
                 listener.onError("資料抓取失敗: " + e.getMessage());
-            } catch (InterruptedException e) {
-                throw new RuntimeException(e);
             }
         }).start();
     }

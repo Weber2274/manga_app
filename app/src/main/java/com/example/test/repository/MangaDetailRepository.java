@@ -10,6 +10,8 @@ import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Random;
 
 public class MangaDetailRepository {
@@ -43,22 +45,35 @@ public class MangaDetailRepository {
                 Elements titleElements = doc.select(".book-title h1");
                 if (!titleElements.isEmpty()) {
                     title = titleElements.first().text();
+                    Log.d("ChapterPage", "Title: " + title);
                 }
 
-                Elements authorElements = doc.select("li:contains(漫畫作者) span:contains(漫畫作者) a");
-                if (!authorElements.isEmpty()) {
-                    author = authorElements.first().text();  // 吾峠呼世晴
+                Element authorElements = doc.selectFirst("li:contains(漫畫作者) span:contains(漫畫作者)");
+//                Elements authorElements = doc.select("span:contains(漫畫作者) a");
+                if (authorElements != null) {
+//                    author = authorElements.first().text();
+                    Element authorLink = authorElements.selectFirst("a");
+                    author = authorLink.text();
+                    Log.d("ChapterPage", "Author: " + author);
                 }
 
 
-                Elements yearElements = doc.select("li:contains(出品年代) a");
-                if (!yearElements.isEmpty()) {
-                    year = yearElements.first().text();
+                Element yearElements = doc.selectFirst("li:contains(出品年代)");
+//                Elements yearElements = doc.select("span:contains(出品年代) a");
+                if (yearElements != null) {
+//                    year = yearElements.first().text();
+                    Element yearLink = yearElements.selectFirst("a");
+                    year = yearLink.text();
+                    Log.d("ChapterPage", "Year: " + year);
                 }
 
-                Elements regionElements = doc.select("li:contains(漫畫地區) span:contains(漫畫地區) a");
-                if (!regionElements.isEmpty()) {
-                    region = regionElements.first().text();  // 日本漫畫
+                Element regionElements = doc.selectFirst("li:contains(漫畫地區) span:contains(漫畫地區)");
+//                Elements regionElements = doc.select("span:contains(漫畫地區) a");
+                if (regionElements != null) {
+//                    region = regionElements.first().text();  // 日本漫畫
+                    Element regionLink = regionElements.selectFirst("a");
+                    region = regionLink.text();
+                    Log.d("ChapterPage", "Region: " + region);
                 }
 
 
@@ -71,13 +86,21 @@ public class MangaDetailRepository {
                     }else{
                         status = dredSpan.text();
                     }
+                    Log.d("ChapterPage", "Status: " + status);
                 }
-                MangaDetail mangaDetail = new MangaDetail(imgUrl,title,author,year,region,status);
-                Thread.sleep(500 + new Random().nextInt(500));
+                List<String> pageTitleList = new ArrayList<>();
+//                Elements pageTitles = doc.select("div.chapter-page a[title]");
+//                for (Element a : pageTitles) {
+//                    String pageRange = a.attr("title");
+//                    pageTitleList.add(pageRange);
+//                    Log.d("ChapterPage", "Title: " + pageRange);
+//                }
+                MangaDetail mangaDetail = new MangaDetail(imgUrl,title,author,year,region,status,pageTitleList);
+//                Thread.sleep(200 + new Random().nextInt(500));
                 Log.d("DetailRepo",author);
                 listener.onSuccess(mangaDetail);
 
-            } catch (IOException | InterruptedException e) {
+            } catch (IOException e) {
                 listener.onError("資料抓取失敗: " + e.getMessage());
             }
         }).start();

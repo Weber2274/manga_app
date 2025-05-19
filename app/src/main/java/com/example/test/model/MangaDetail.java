@@ -1,5 +1,7 @@
 package com.example.test.model;
 
+import java.util.List;
+
 public class MangaDetail {
     private String coverImg;
     private String title;
@@ -7,16 +9,16 @@ public class MangaDetail {
     private String year;
     private String area;
     private String status;
-
-    public MangaDetail(String coverImg, String title, String author, String year, String area, String status) {
+    private List<String> pageTitle;
+    public MangaDetail(String coverImg, String title, String author, String year, String area, String status, List<String> pageTitle) {
         this.coverImg = coverImg;
         this.title = title;
         this.author = author;
         this.year = year;
         this.area = area;
         this.status = status;
+        this.pageTitle = pageTitle;
     }
-    //    private List<Chapter> chapterList;
 
     public String getCoverImg() {
         return coverImg;
@@ -39,9 +41,7 @@ public class MangaDetail {
         return status;
     }
 
+    public List<String> getPageTitle(){return pageTitle;}
 
 
-//    public List<Chapter> getChapterList() {
-//        return chapterList;
-//    }
 }

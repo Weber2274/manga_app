@@ -53,7 +53,7 @@ public class CategoryRepository {
 
                 List<MangaItem> mangaItemList = new ArrayList<>();
                 Elements mangas = document.select("div.book-list ul#contList > li");
-
+                int i = 0;
                 for (Element element : mangas) {
                     String title = element.select("a.bcover").attr("title");
                     String imgUrl = element.select("a.bcover img").attr("data-src");
@@ -66,12 +66,12 @@ public class CategoryRepository {
                     String href = element.select("a.bcover").attr("href");
                     String pageUrl = "https://tw.manhuagui.com" + href;
                     mangaItemList.add(new MangaItem(title, imgUrl, pageUrl));
-                    Thread.sleep(500 + new Random().nextInt(500));
+
                 }
 
                 cache.put(url, mangaItemList);
                 listener.onSuccess(mangaItemList);
-            } catch (IOException | InterruptedException e) {
+            } catch (IOException e) {
                 listener.onError("資料抓取失敗: " + e.getMessage());
             }
         }).start();
