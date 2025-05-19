@@ -107,23 +107,26 @@ public class MangaDetailActivity extends AppCompatActivity {
                         "meta.content = 'width=device-width, initial-scale=0.6, maximum-scale=1.0, user-scalable=no';" +
                         "document.getElementsByTagName('head')[0].appendChild(meta);" +
 
-                        "var commentDiv = document.querySelector('div#Comment');" +
-                        "var chapterDiv = document.querySelector('div.chapter.cf.mt16');" +
-                        "var wrapper = document.createElement('div');" +
-                        "if (chapterDiv) wrapper.appendChild(chapterDiv.cloneNode(true));" +
-                        "if (commentDiv) wrapper.appendChild(commentDiv.cloneNode(true));" +
-                        "document.body.innerHTML = ''; " +  // 清空 body
-                        "document.body.appendChild(wrapper); " +
-
-                        // 統一設定 body 跟 html 的 margin, padding 和 overflow
-                        "document.body.style.margin = '0';" +
-                        "document.body.style.padding = '10px';" +  // 你需要的 padding 可以調整
-                        "document.body.style.background = '#fff';" +
-                        "document.body.style.height = 'auto';" +
-                        "document.documentElement.style.margin = '0';" +
-                        "document.documentElement.style.padding = '0';" +
-                        "document.documentElement.style.height = 'auto';" +
-                        "document.body.style.overflow = 'auto';" +
+                        "var targetDiv = document.querySelector('div.chapter.cf.mt16');" +
+                        "var comments = document.querySelector('#Comment');" +
+                        "if (targetDiv) {" +
+                        "   var wrapper = document.createElement('div');" +
+                        "   var originalDiv = targetDiv.cloneNode(true);" +
+                        "   wrapper.appendChild(originalDiv);" +
+                        "   if (comments) {" +
+                        "       wrapper.appendChild(comments.cloneNode(true));" +
+                        "   }" +
+                        "   wrapper.style.position = 'relative';" +
+                        "   wrapper.style.zIndex = '9999';" +
+                        "   wrapper.style.background = '#fff';" +
+                        "   wrapper.style.padding = '10px';" +
+                        "   wrapper.style.minHeight = '100vh';" +
+                        "   document.body.innerHTML = '';" +
+                        "   document.body.appendChild(wrapper);" +
+                        "   document.body.style.height = 'auto';" +
+                        "   document.documentElement.style.height = 'auto';" +
+                        "   document.body.style.overflow = 'auto';" +
+                        "}" +
 
                         "const navItems = document.querySelectorAll('#chapter-page-1 ul li');" +
                         "const chapterContainer = document.querySelector('#chapter-list-1');" +
@@ -143,27 +146,20 @@ public class MangaDetailActivity extends AppCompatActivity {
                         "   });" +
                         "}" +
 
-                        // 移除 footer
+                        "document.body.style.margin='0';" +
+                        "document.body.style.padding='0';" +
+                        "document.documentElement.style.margin='0';" +
+                        "document.documentElement.style.padding='0';" +
+                        "document.body.style.overflow='hidden';" +
+                        "document.documentElement.style.overflow='hidden';" +
                         "var footer = document.querySelector('footer');" +
                         "if (footer) footer.remove();" +
 
-                        // 圖片載入時更新高度
-                        "function updateHeight() {" +
+                        "setTimeout(function() {" +
                         "  if (typeof Android !== 'undefined' && Android.setHeight) {" +
                         "    Android.setHeight(document.body.scrollHeight);" +
                         "  }" +
-                        "}" +
-
-                        "var imgs = document.images;" +
-                        "for (var i = 0; i < imgs.length; i++) {" +
-                        "  if (!imgs[i].complete) {" +
-                        "    imgs[i].addEventListener('load', updateHeight);" +
-                        "    imgs[i].addEventListener('error', updateHeight);" +
-                        "  }" +
-                        "}" +
-
-                        // 頁面載入完成後也執行一次高度更新
-                        "setTimeout(updateHeight, 300);" +
+                        "}, 300);" +
 
                         "var style = document.createElement('style');" +
                         "style.innerHTML = `" +
@@ -188,11 +184,15 @@ public class MangaDetailActivity extends AppCompatActivity {
                         "`;" +
                         "document.head.appendChild(style);" +
 
-                        "})();";
+                        // 頁面初始調整高度
+                        "if (typeof Android !== 'undefined' && Android.setHeight) {" +
+                        "  Android.setHeight(document.body.scrollHeight);" +
+                        "}" +
+
+                        "})()";
 
                 webView.loadUrl(js);
             }
-
         });
 
 
