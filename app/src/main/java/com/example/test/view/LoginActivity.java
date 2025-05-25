@@ -90,10 +90,8 @@ public class LoginActivity extends AppCompatActivity {
                 view.evaluateJavascript(js, null);
             }
         });
-
         webView.loadUrl("https://tw.manhuagui.com/user/login");
     }
-
 
     private void saveLoginStatus(String cookie) {
         Log.d("LoginActivity_cookie", "保存 cookie: " + cookie);
@@ -103,5 +101,4 @@ public class LoginActivity extends AppCompatActivity {
         editor.putString("cookie", cookie);
         editor.apply();
     }
-
 }
