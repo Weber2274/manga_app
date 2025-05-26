@@ -33,7 +33,7 @@ public class MainActivity extends AppCompatActivity {
     private final Fragment filterFragment = FilterFragment.newInstance("", "");
     private final Fragment historyFragment = HistoryFragment.newInstance("", "");
     private final Fragment likeFragment = LikeFragment.newInstance("", "");
-    private final Fragment settingFragment = SettingFragment.newInstance("", "");
+    private final Fragment settingFragment = new SettingFragment();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
