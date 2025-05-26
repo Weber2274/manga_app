@@ -109,30 +109,44 @@ public class MangaDetailActivity extends AppCompatActivity {
                         "})()");
 
 
-                webView.loadUrl("javascript:(function() {" +
-                        "var targetDiv = document.querySelector('div.chapter.cf.mt16');" +
-                        "var comments = document.querySelector('#Comment');" +
-                        "if (targetDiv) {" +
-                        "   var wrapper = document.createElement('div');" +
-                        "   var originalDiv = targetDiv.cloneNode(true);" +
-                        "   wrapper.appendChild(originalDiv);" +
-                        "   if (comments) {" +
-                        "       wrapper.appendChild(comments.cloneNode(true));" +
-                        "   }" +
-                        "   wrapper.style.position = 'relative';" +
-                        "   wrapper.style.zIndex = '9999';" +
-                        "   wrapper.style.background = '#fff';" +
-                        "   wrapper.style.padding = '10px';" +
-                        "   wrapper.style.minHeight = '100vh';" +
-                        "   document.body.innerHTML = '';" +
-                        "   document.body.appendChild(wrapper);" +
-                        "   document.body.style.height = 'auto';" +
-                        "   document.documentElement.style.height = 'auto';" +
-                        "   document.body.style.overflow = 'auto';" +
-                        "}" +
-                        "})()");
+                String js = "javascript:(function() {"
+                        + "var commentBtn = document.querySelector('.btn-showcomment');"
+                        + "if (commentBtn) { commentBtn.click(); }"
 
+                        + "var bodyChildren = document.body.children;"
+                        + "for (var i = 0; i < bodyChildren.length; i++) {"
+                        + "  var child = bodyChildren[i];"
+                        + "  if (!(child.classList.contains('w998') && child.classList.contains('bc') && child.classList.contains('cf'))) {"
+                        + "    child.style.display = 'none';"
+                        + "  } else {"
+                        + "    var innerChildren = child.children;"
+                        + "    for (var j = 0; j < innerChildren.length; j++) {"
+                        + "      var innerChild = innerChildren[j];"
+                        + "      if (innerChild.classList.contains('fl') && innerChild.classList.contains('w728')) {"
+                        + "        var flChildren = innerChild.children;"
+                        + "        for (var k = 0; k < flChildren.length; k++) {"
+                        + "          var flChild = flChildren[k];"
+                        + "          if (flChild.classList.contains('chapter') || flChild.id === 'Comment') {"
+                        + "            flChild.style.display = 'block';"
+                        + "            if(flChild.id === 'Comment'){"
+                        + "              flChild.style.visibility = 'visible';"
+                        + "              flChild.style.opacity = '1';"
+                        + "            }"
+                        + "          } else {"
+                        + "            flChild.style.display = 'none';"
+                        + "          }"
+                        + "        }"
+                        + "        innerChild.style.display = 'block';"
+                        + "      } else {"
+                        + "        innerChild.style.display = 'none';"
+                        + "      }"
+                        + "    }"
+                        + "    child.style.display = 'block';"
+                        + "  }"
+                        + "}"
+                        + "})();";
 
+                webView.loadUrl(js);
 
                 webView.loadUrl("javascript:(function() {" +
                         "const navItems = document.querySelectorAll('#chapter-page-1 ul li');" +
