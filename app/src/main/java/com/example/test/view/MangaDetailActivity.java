@@ -20,14 +20,13 @@ import androidx.lifecycle.ViewModelProvider;
 
 import com.bumptech.glide.Glide;
 import com.example.test.R;
-import com.example.test.model.MangaDetail;
 import com.example.test.viewmodel.MangaDetailViewModel;
 
 public class MangaDetailActivity extends AppCompatActivity {
     private ImageView imgCover;
     private TextView title,author,region,year,status;
     private ProgressBar progressBar;
-    private Button read,like;
+    Button read,like;
     @SuppressLint({"SetTextI18n", "MissingInflatedId"})
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -71,17 +70,14 @@ public class MangaDetailActivity extends AppCompatActivity {
 
         SharedPreferences prefs = getSharedPreferences("Myprefs", MODE_PRIVATE);
         boolean isLogin = prefs.getBoolean("isLogin", false);
-        like.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                if(isLogin){
-                    like.setText("已收藏");
-                }
-                else{
-                    Intent intent = new Intent(MangaDetailActivity.this,LoginActivity.class);
-                    Toast.makeText(MangaDetailActivity.this, "登入後才能使用", Toast.LENGTH_LONG).show();
-                    startActivity(intent);
-                }
+        like.setOnClickListener(view -> {
+            if(isLogin){
+                like.setText("已收藏");
+            }
+            else{
+                Intent intent = new Intent(MangaDetailActivity.this,LoginActivity.class);
+                Toast.makeText(MangaDetailActivity.this, "登入後才能使用", Toast.LENGTH_LONG).show();
+                startActivity(intent);
             }
         });
     }
