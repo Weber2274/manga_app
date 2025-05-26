@@ -1,11 +1,15 @@
 package com.example.test.view;
 
 import android.annotation.SuppressLint;
+import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.view.View;
+import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
@@ -23,6 +27,7 @@ public class MangaDetailActivity extends AppCompatActivity {
     private ImageView imgCover;
     private TextView title,author,region,year,status;
     private ProgressBar progressBar;
+    private Button read,like;
     @SuppressLint({"SetTextI18n", "MissingInflatedId"})
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -41,6 +46,8 @@ public class MangaDetailActivity extends AppCompatActivity {
         region = findViewById(R.id.detail_region);
         year = findViewById(R.id.detail_year);
         status = findViewById(R.id.detail_status);
+        read = findViewById(R.id.btn_read);
+        like = findViewById(R.id.btn_like);
         String url = getIntent().getStringExtra("pageUrl");
         MangaDetailViewModel viewModel = new ViewModelProvider(this).get(MangaDetailViewModel.class);
         viewModel.loadMangaDetail(url);
@@ -59,6 +66,22 @@ public class MangaDetailActivity extends AppCompatActivity {
                 region.setText("地區: " + mangaDetail.getArea());
                 year.setText("出品年代: " + mangaDetail.getYear());
                 status.setText("作品狀態: " + mangaDetail.getStatus());
+            }
+        });
+
+        SharedPreferences prefs = getSharedPreferences("Myprefs", MODE_PRIVATE);
+        boolean isLogin = prefs.getBoolean("isLogin", false);
+        like.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if(isLogin){
+                    like.setText("已收藏");
+                }
+                else{
+                    Intent intent = new Intent(MangaDetailActivity.this,LoginActivity.class);
+                    Toast.makeText(MangaDetailActivity.this, "登入後才能使用", Toast.LENGTH_LONG).show();
+                    startActivity(intent);
+                }
             }
         });
     }

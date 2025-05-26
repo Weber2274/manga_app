@@ -15,13 +15,14 @@ import android.view.ViewGroup;
 import android.widget.Button;
 
 import com.example.test.R;
+import com.example.test.model.SessionManager;
+import android.widget.Toast;
 
 public class LikeFragment extends Fragment {
     private static final String ARG_PARAM1 = "param1";
     private static final String ARG_PARAM2 = "param2";
     private String mParam1;
     private String mParam2;
-    Button btn_like;
 
     public LikeFragment() {
         // Required empty public constructor
@@ -44,13 +45,4 @@ public class LikeFragment extends Fragment {
             mParam2 = getArguments().getString(ARG_PARAM2);
         }
     }
-
-    @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                             Bundle savedInstanceState) {
-        return inflater.inflate(R.layout.fragment_like, container, false);
-    }
-
-
-
 }
