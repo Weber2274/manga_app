@@ -42,8 +42,7 @@ public class LikeViewModel extends ViewModel {
     }
 
     public void refreshMangaData(Context context) {
-        // 強制清空 Repository 快取再抓取
-        LikeRepository.getInstance().clearCache(); // 等下新增
+        LikeRepository.getInstance().clearCache();
         loadMangaData(context);
     }
 }

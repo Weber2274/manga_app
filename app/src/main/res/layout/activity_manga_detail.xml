@@ -119,7 +119,7 @@
             <WebView
                 android:id="@+id/manga_chapter"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
+                android:layout_height="350dp"
                 android:layout_marginTop="78dp"
                 android:overScrollMode="never" />
         </LinearLayout>

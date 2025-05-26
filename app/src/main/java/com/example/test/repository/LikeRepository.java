@@ -19,7 +19,6 @@ import java.util.Random;
 public class LikeRepository {
     private static LikeRepository instance;
 
-    // 快取收藏資料
     private final List<MangaItem> cache = new ArrayList<>();
 
     private LikeRepository() {
@@ -49,7 +48,6 @@ public class LikeRepository {
             List<MangaItem> allManga = new ArrayList<>();
 
             try {
-                // 1. 抓第一頁來取得總記錄與第一頁資料
                 String baseUrl = "https://tw.manhuagui.com/user/book/shelf/";
                 Document firstPage = Jsoup.connect(baseUrl + "1")
                         .userAgent("Mozilla/5.0")
@@ -59,7 +57,6 @@ public class LikeRepository {
                         .timeout(15000)
                         .get();
 
-                // 2. 擷取總記錄數
                 Element totalRecordElement = firstPage.selectFirst("span:matchesOwn(共\\d+記錄)");
                 int totalRecords = 0;
                 if (totalRecordElement != null) {
@@ -69,7 +66,6 @@ public class LikeRepository {
                 int totalPages = (int) Math.ceil(totalRecords / 20.0);
                 Log.d("LikeRepository", "總記錄：" + totalRecords + "，共 " + totalPages + " 頁");
 
-                // 3. 開始抓每一頁資料
                 for (int page = 1; page <= totalPages; page++) {
                     Log.d("LikeRepository", "抓取第 " + page + " 頁");
                     Document document = page == 1 ? firstPage :
