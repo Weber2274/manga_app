@@ -91,11 +91,7 @@ public class LikeFragment extends Fragment {
                 likeAdapter.setMangas(mangaItems);
             }
         });
-        likeAdapter.setOnItemClickListener(item -> {
-            Intent intent = new Intent(requireActivity(), MangaDetailActivity.class);
-            intent.putExtra("pageUrl",item.getPageUrl());
-            startActivity(intent);
-        });
+
         swipeRefreshLayout = view.findViewById(R.id.swipe_refresh);
 
         swipeRefreshLayout.setOnRefreshListener(() -> {

@@ -91,7 +91,7 @@ public class LikeRepository {
                         }
                         String href = element.select("a").attr("href");
                         String pageUrl = "https://tw.manhuagui.com" + href;
-                        allManga.add(new MangaItem(title, imgUrl, pageUrl));
+                        allManga.add(new MangaItem(title, imgUrl));
                     }
                 }
 

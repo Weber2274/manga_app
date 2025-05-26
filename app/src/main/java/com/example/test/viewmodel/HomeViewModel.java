@@ -21,35 +21,43 @@ public class HomeViewModel extends ViewModel {
     private MutableLiveData<Boolean> isLoading = new MutableLiveData<>();
     private HomeRepository homeRepository;
     private MutableLiveData<String> errorLiveData;
+
     public HomeViewModel() {
-//        homeRepository = new HomeRepository();
         flatListLiveData = new MutableLiveData<>();
         errorLiveData = new MutableLiveData<>();
     }
+
     public LiveData<List<ItemList>> getMangas() {
         return flatListLiveData;
     }
+
     public LiveData<String> getError() {
         return errorLiveData;
     }
-    public LiveData<Boolean> getIsLoading() {return isLoading;}
+
+    public LiveData<Boolean> getIsLoading() {
+        return isLoading;
+    }
 
     public void loadMangas() {
         if (Boolean.TRUE.equals(isLoading.getValue())) return;
 
         isLoading.setValue(true);
+
         HomeRepository.getInstance().fetchMangaFromHomePage(new HomeRepository.OnHomePageLoadedListener() {
             @Override
-            public void onSuccess(List<MangaGroup> categories) {
+            public void onSuccess(List<Book> books) {
                 isLoading.postValue(false);
                 List<ItemList> flatList = new ArrayList<>();
-                for (MangaGroup group : categories) {
-                    flatList.add(new CategoryTitleItem(group.getFilter()));
-                    for (Book manga : group.getMangaList()) {
-                        flatList.add(new MangaItem(manga.getTitle(), manga.getImageUrl(), manga.getPageUrl()));
+
+                // 只處理第一組 MangaGroup，並略過分類標題
+                if (!books.isEmpty()) {
+                    for (Book manga : books) {
+                        flatList.add(new MangaItem(manga.getTitle(), manga.getImageUrl()));
                         Log.d("HomeViewModel", "取得資料成功，圖片網址: " + manga.getImageUrl());
                     }
                 }
+
                 Log.d("HomeViewModel", "總共資料筆數: " + flatList.size());
                 flatListLiveData.postValue(flatList);
             }

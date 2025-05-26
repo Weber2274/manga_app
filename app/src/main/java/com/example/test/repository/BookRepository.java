@@ -46,7 +46,7 @@ public class BookRepository {
                         img = "https:" + img;
                     }
                     Log.d("BookRepository",title);
-                    mangases.add(new Book(title + "（" + update + "）", img, pageUrl));
+//                    mangases.add(new Book(title + "（" + update + "）", img, pageUrl));
                 }
 
 

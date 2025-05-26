@@ -4,52 +4,44 @@ import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
 
-import com.example.test.model.ItemList;
 import com.example.test.model.MangaItem;
 import com.example.test.repository.CategoryRepository;
-import com.example.test.repository.HomeRepository;
 
 import java.util.List;
 
 public class CategoryViewModel extends ViewModel {
-    private MutableLiveData<List<MangaItem>> mangaListLiveData;
-    private CategoryRepository categoryRepository;
-    private MutableLiveData<String> errorLiveData;
-    private MutableLiveData<Boolean> loadingLiveData = new MutableLiveData<>();
-    public LiveData<Boolean> getLoading() {
-        return loadingLiveData;
-    }
-    public CategoryViewModel() {
-        categoryRepository = CategoryRepository.getInstance();
-        mangaListLiveData = new MutableLiveData<>();
-        errorLiveData = new MutableLiveData<>();
-    }
-    public LiveData<List<MangaItem>> getCategory() {
-        return mangaListLiveData;
-    }
-    public LiveData<String> getError() {
-        return errorLiveData;
-    }
-    private boolean isLoading = false;
-    public void loadCategories(String url){
-        if (isLoading) return;
-        isLoading = true;
-        loadingLiveData.postValue(true);
-        mangaListLiveData.postValue(null);
-        categoryRepository.fetchMangaFromCategoryPage(url, new CategoryRepository.OnCategoryLoadedListener() {
+    private final MutableLiveData<List<MangaItem>> mangaListLiveData = new MutableLiveData<>();
+    private final MutableLiveData<Boolean> loadingLiveData = new MutableLiveData<>();
+    private final MutableLiveData<String> errorLiveData = new MutableLiveData<>();
+
+    private final CategoryRepository repository = CategoryRepository.getInstance();
+
+    public void loadCategory(String categoryName) {
+        loadingLiveData.setValue(true);
+        repository.fetchMangaGroupedByCategory(categoryName, new CategoryRepository.OnCategoryGroupedListener() {
             @Override
-            public void onSuccess(List<MangaItem> mangaItems) {
-                isLoading = false;
-                loadingLiveData.postValue(false);
-                mangaListLiveData.postValue(mangaItems);
+            public void onSuccess(List<MangaItem> groupedData) {
+                mangaListLiveData.setValue(groupedData);
+                loadingLiveData.setValue(false);
             }
 
             @Override
             public void onError(String error) {
-                isLoading = false;
-                loadingLiveData.postValue(false);
-                errorLiveData.postValue(error);
+                errorLiveData.setValue(error);
+                loadingLiveData.setValue(false);
             }
         });
+    }
+
+    public LiveData<List<MangaItem>> getMangaList() {
+        return mangaListLiveData;
+    }
+
+    public LiveData<Boolean> isLoading() {
+        return loadingLiveData;
+    }
+
+    public LiveData<String> getError() {
+        return errorLiveData;
     }
 }

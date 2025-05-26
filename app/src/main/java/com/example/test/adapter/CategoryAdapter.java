@@ -1,7 +1,5 @@
 package com.example.test.adapter;
 
-import android.annotation.SuppressLint;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -13,61 +11,54 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
 import com.example.test.R;
-import com.example.test.model.ItemList;
 import com.example.test.model.MangaItem;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class CategoryAdapter extends RecyclerView.Adapter<CategoryAdapter.CategoryViewHolder>{
+public class CategoryAdapter extends RecyclerView.Adapter<CategoryAdapter.ViewHolder> {
 
-    private List<MangaItem> mangaItems = new ArrayList<>();
-    public interface OnItemClickListener{
-        void onItemClick(MangaItem item);
-    }
-    private OnItemClickListener listener;
+    private List<MangaItem> mangas = new ArrayList<>();
 
-    public void setOnItemClickListener(OnItemClickListener listener) {
-        this.listener = listener;
-    }
-    @SuppressLint("NotifyDataSetChanged")
-    public void setMangas(List<MangaItem> mangaItems) {
-        this.mangaItems = mangaItems;
+    public void setMangas(List<MangaItem> mangaList) {
+        if (mangaList == null) mangaList = new ArrayList<>();
+        this.mangas = mangaList;
         notifyDataSetChanged();
     }
+
     @NonNull
     @Override
-    public CategoryViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+    public CategoryAdapter.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         View view = LayoutInflater.from(parent.getContext())
                 .inflate(R.layout.item_book, parent, false);
-        return new CategoryViewHolder(view);
+        return new ViewHolder(view);
     }
 
     @Override
-    public void onBindViewHolder(@NonNull CategoryViewHolder holder, int position) {
-        MangaItem mangaItem = mangaItems.get(position);
-        holder.title.setText(mangaItem.getTitle());
-        Glide.with(holder.itemView.getContext()).load(mangaItem.getImgUrl()).into(holder.cover);
-        holder.itemView.setOnClickListener(view -> {
-            if(listener != null){
-                listener.onItemClick(mangaItem);
-            }
-        });
+    public void onBindViewHolder(@NonNull CategoryAdapter.ViewHolder holder, int position) {
+        MangaItem manga = mangas.get(position);
+        holder.title.setText(manga.getTitle());
+        Glide.with(holder.itemView.getContext()).load(manga.getImgUrl()).into(holder.image);
     }
 
     @Override
     public int getItemCount() {
-        Log.d("CategoryAdapter", "Item count: " + mangaItems.size());
-        return mangaItems.size();
+        return mangas.size();
     }
 
-    public static class CategoryViewHolder extends RecyclerView.ViewHolder {
+    public static class ViewHolder extends RecyclerView.ViewHolder {
         TextView title;
-        ImageView cover;
-        public CategoryViewHolder(@NonNull View itemView) {
+        ImageView image;
+
+        public ViewHolder(@NonNull View itemView) {
             super(itemView);
             title = itemView.findViewById(R.id.textTitle);
-            cover = itemView.findViewById(R.id.imageCover);
+            image = itemView.findViewById(R.id.imageCover);
+        }
+    }
+
+    public class OnItemClickListener {
+        public void onItemClick(MangaItem manga) {
         }
     }
 }

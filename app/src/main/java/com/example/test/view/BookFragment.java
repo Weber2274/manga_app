@@ -53,16 +53,6 @@ public class BookFragment extends Fragment {
         adapter = new BookAdapter();
         recyclerView.setAdapter(adapter);
 
-        adapter.setOnBookClickListener(book -> {
-            String url = book.getPageUrl();
-            if (url != null && !url.isEmpty()) {
-                Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(url));
-                startActivity(intent);
-            } else {
-                Toast.makeText(getContext(), "找不到漫畫連結"+url, Toast.LENGTH_SHORT).show();
-            }
-        });
-
         viewModel = new ViewModelProvider(this).get(BookViewModel.class);
         viewModel.getBooks().observe(getViewLifecycleOwner(), adapter::setBooks);
 

@@ -24,6 +24,7 @@ import com.example.test.adapter.CategoryAdapter;
 import com.example.test.adapter.HomeAdapter;
 import com.example.test.model.MangaItem;
 import com.example.test.model.SessionManager;
+//import com.example.test.viewmodel.HomeViewModel;
 import com.example.test.viewmodel.HomeViewModel;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 
@@ -151,11 +152,6 @@ public class HomeFragment extends Fragment {
                 Log.d("HomeFragment", "Items loaded: " + items.size());
                 adapter.setItems(items);
             }
-        });
-        adapter.setOnItemClickListener(item -> {
-            Intent intent = new Intent(requireActivity(), MangaDetailActivity.class);
-            intent.putExtra("pageUrl",item.getPageUrl());
-            startActivity(intent);
         });
         viewModel.getIsLoading().observe(getViewLifecycleOwner(), isLoading -> {
             if (isLoading != null && isLoading) {

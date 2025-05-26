@@ -16,9 +16,10 @@ import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 import androidx.fragment.app.Fragment;
 
-import com.example.test.view.BookFragment;
+//import com.example.test.view.BookFragment;
 import com.example.test.view.FilterFragment;
 import com.example.test.view.HistoryFragment;
+//import com.example.test.view.HomeFragment;
 import com.example.test.view.HomeFragment;
 import com.example.test.view.LikeFragment;
 import com.example.test.view.LoginActivity;
