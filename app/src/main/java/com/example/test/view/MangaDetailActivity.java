@@ -70,9 +70,18 @@ public class MangaDetailActivity extends AppCompatActivity {
 
         SharedPreferences prefs = getSharedPreferences("Myprefs", MODE_PRIVATE);
         boolean isLogin = prefs.getBoolean("isLogin", false);
+        boolean isLike = prefs.getBoolean("isLike", false);
+        SharedPreferences.Editor editor = prefs.edit();
         like.setOnClickListener(view -> {
             if(isLogin){
+                if(!isLike){
                 like.setText("已收藏");
+                editor.putBoolean("isLike", true);
+                }
+                else{
+                    like.setText("收藏");
+                    editor.putBoolean("isLike", false);
+                }
             }
             else{
                 Intent intent = new Intent(MangaDetailActivity.this,LoginActivity.class);
