@@ -140,6 +140,7 @@ public class HomeFragment extends Fragment {
                 }else{
                     return 1;
                 }
+
             }
         });
         recyclerView.setLayoutManager(layoutManager);
