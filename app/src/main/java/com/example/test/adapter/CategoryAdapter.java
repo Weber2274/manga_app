@@ -18,8 +18,14 @@ import java.util.List;
 
 public class CategoryAdapter extends RecyclerView.Adapter<CategoryAdapter.ViewHolder> {
 
+    public interface OnItemClickListener {
+        void onItemClick(MangaItem manga);
+    }
     private List<MangaItem> mangas = new ArrayList<>();
-
+    private OnItemClickListener listener;
+    public void setOnItemClickListener(OnItemClickListener listener) {
+        this.listener = listener;
+    }
     public void setMangas(List<MangaItem> mangaList) {
         if (mangaList == null) mangaList = new ArrayList<>();
         this.mangas = mangaList;
@@ -39,6 +45,11 @@ public class CategoryAdapter extends RecyclerView.Adapter<CategoryAdapter.ViewHo
         MangaItem manga = mangas.get(position);
         holder.title.setText(manga.getTitle());
         Glide.with(holder.itemView.getContext()).load(manga.getImgUrl()).into(holder.image);
+        holder.itemView.setOnClickListener(view -> {
+            if(listener != null){
+                listener.onItemClick(manga);
+            }
+        });
     }
 
     @Override
@@ -57,8 +68,5 @@ public class CategoryAdapter extends RecyclerView.Adapter<CategoryAdapter.ViewHo
         }
     }
 
-    public class OnItemClickListener {
-        public void onItemClick(MangaItem manga) {
-        }
-    }
+
 }

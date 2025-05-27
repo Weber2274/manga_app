@@ -1,5 +1,6 @@
 package com.example.test.view;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -14,6 +15,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.test.R;
 import com.example.test.adapter.CategoryAdapter;
+import com.example.test.model.MangaItem;
 import com.example.test.viewmodel.CategoryViewModel;
 import com.google.android.material.tabs.TabLayout;
 
@@ -55,7 +57,12 @@ public class FilterFragment extends Fragment {
         observeViewModel();
 
         viewModel.loadCategory("熱血");
-
+        adapter.setOnItemClickListener(manga -> {
+            Intent intent = new Intent(requireActivity(), MangaDetailActivity.class);
+            String title = manga.getTitle();
+            intent.putExtra("title",title);
+            startActivity(intent);
+        });
         tabLayout.addOnTabSelectedListener(new TabLayout.OnTabSelectedListener() {
             @Override
             public void onTabSelected(TabLayout.Tab tab) {

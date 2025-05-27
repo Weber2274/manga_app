@@ -26,9 +26,6 @@ public class HomeAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
     public static final int TYPE_CATEGORY = 1;
     public static final int TYPE_MANGA = 2;
 
-    public interface OnItemClickListener{
-        void onItemClick(MangaItem item);
-    }
     private CategoryAdapter.OnItemClickListener listener;
 
     public void setOnItemClickListener(CategoryAdapter.OnItemClickListener listener) {

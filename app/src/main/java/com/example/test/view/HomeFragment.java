@@ -143,7 +143,12 @@ public class HomeFragment extends Fragment {
             }
         });
         recyclerView.setLayoutManager(layoutManager);
-
+        adapter.setOnItemClickListener(manga -> {
+            Intent intent = new Intent(requireActivity(), MangaDetailActivity.class);
+            String title = manga.getTitle();
+            intent.putExtra("title",title);
+            startActivity(intent);
+        });
         viewModel = new ViewModelProvider(this).get(HomeViewModel.class);
         viewModel.loadMangas();
         viewModel.getMangas().observe(getViewLifecycleOwner(), items -> {

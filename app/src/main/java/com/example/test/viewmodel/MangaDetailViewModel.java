@@ -31,11 +31,11 @@ public class MangaDetailViewModel extends ViewModel {
     public LiveData<String> getErrorLiveData() {
         return errorLiveData;
     }
-    public void loadMangaDetail(String url){
+    public void loadMangaDetail(String title){
         if (isLoading) return;
         isLoading = true;
         loadingLiveData.postValue(true);
-        repository.fetchMangaDetail(url, new MangaDetailRepository.OnDetailLoadedListener() {
+        repository.fetchMangaDetail(title, new MangaDetailRepository.OnDetailLoadedListener() {
             @Override
             public void onSuccess(MangaDetail mangaDetail) {
                 isLoading = false;
