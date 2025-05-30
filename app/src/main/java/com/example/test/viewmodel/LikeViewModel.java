@@ -1,7 +1,5 @@
 package com.example.test.viewmodel;
 
-import static androidx.core.content.ContentProviderCompat.requireContext;
-
 import android.content.Context;
 import android.util.Log;
 
