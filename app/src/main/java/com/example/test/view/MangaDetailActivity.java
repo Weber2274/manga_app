@@ -93,7 +93,7 @@ public class MangaDetailActivity extends AppCompatActivity {
         int no = 1;
         like.setOnClickListener(view -> {
             FirebaseFirestore db = FirebaseFirestore.getInstance();
-            if(isLogin){
+            //if(isLogin){
                 DocumentReference favDocRef = db.collection("users")
                                                 .document("user1")
                                                 .collection("favorites")
@@ -123,12 +123,12 @@ public class MangaDetailActivity extends AppCompatActivity {
                                 });
                     }
                 });
-            }
-            else{
-                Intent intent = new Intent(MangaDetailActivity.this,LoginActivity.class);
-                Toast.makeText(MangaDetailActivity.this, "登入後才能使用", Toast.LENGTH_LONG).show();
-                startActivity(intent);
-            }
+            //}
+//            else{
+//                Intent intent = new Intent(MangaDetailActivity.this,LoginActivity.class);
+//                Toast.makeText(MangaDetailActivity.this, "登入後才能使用", Toast.LENGTH_LONG).show();
+//                startActivity(intent);
+//            }
         });
     }
 }
