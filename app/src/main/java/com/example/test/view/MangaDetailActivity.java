@@ -37,6 +37,7 @@ public class MangaDetailActivity extends AppCompatActivity {
     private ProgressBar progressBar;
     private Toolbar toolbar;
     private Button like;
+    private int num = 1;
     @SuppressLint({"SetTextI18n", "MissingInflatedId", "SetJavaScriptEnabled"})
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -89,16 +90,14 @@ public class MangaDetailActivity extends AppCompatActivity {
         Map<String, Object> data = new HashMap<>();
         data.put("title", this.title);
         data.put("cover", imgCover);
-        String mangaId = "favorite";
-        int no = 1;
         like.setOnClickListener(view -> {
             FirebaseFirestore db = FirebaseFirestore.getInstance();
-            //if(isLogin){
+            if(isLogin){
                 DocumentReference favDocRef = db.collection("users")
                                                 .document("user1")
                                                 .collection("favorites")
-                                                .document(mangaId + no);
-                //no++
+                                                .document("favorite" + num);
+
 
                 favDocRef.get().addOnSuccessListener(documentSnapshot -> {
                     if (documentSnapshot.exists()) {
@@ -123,12 +122,13 @@ public class MangaDetailActivity extends AppCompatActivity {
                                 });
                     }
                 });
-            //}
-//            else{
-//                Intent intent = new Intent(MangaDetailActivity.this,LoginActivity.class);
-//                Toast.makeText(MangaDetailActivity.this, "登入後才能使用", Toast.LENGTH_LONG).show();
-//                startActivity(intent);
-//            }
+            }
+            else{
+                Intent intent = new Intent(MangaDetailActivity.this,LoginActivity.class);
+                Toast.makeText(MangaDetailActivity.this, "登入後才能使用", Toast.LENGTH_LONG).show();
+                startActivity(intent);
+            }
         });
+        num++;
     }
 }
