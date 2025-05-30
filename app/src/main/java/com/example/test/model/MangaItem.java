@@ -17,6 +17,13 @@ public class MangaItem implements ItemList{
         return imgUrl;
     }
 
+    public void setTitle(String title) {
+        this.title = title;
+    }
+
+    public void setImgUrl(String imgUrl) {
+        this.imgUrl = imgUrl;
+    }
 
     @Override
     public int getType() {

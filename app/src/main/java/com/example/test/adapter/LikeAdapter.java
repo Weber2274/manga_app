@@ -13,7 +13,6 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
 import com.example.test.R;
-import com.example.test.model.LikeItem;
 import com.example.test.model.MangaItem;
 
 import java.util.ArrayList;
@@ -21,7 +20,7 @@ import java.util.List;
 
 public class LikeAdapter extends RecyclerView.Adapter<LikeAdapter.LikeViewHolder> {
 
-    private List<MangaItem> mangaItems = new ArrayList<>();
+    private List<MangaItem> mangaList = new ArrayList<>();
     public interface OnItemClickListener {
         void onItemClick(MangaItem item);
     }
@@ -32,7 +31,7 @@ public class LikeAdapter extends RecyclerView.Adapter<LikeAdapter.LikeViewHolder
     }
     @SuppressLint("NotifyDataSetChanged")
     public void setMangas(List<MangaItem> mangaItems) {
-        this.mangaItems = mangaItems;
+        this.mangaList = mangaItems;
         notifyDataSetChanged();
     }
 
@@ -46,7 +45,7 @@ public class LikeAdapter extends RecyclerView.Adapter<LikeAdapter.LikeViewHolder
 
     @Override
     public void onBindViewHolder(@NonNull LikeViewHolder holder, int position) {
-        MangaItem mangaItem = mangaItems.get(position);
+        MangaItem mangaItem = mangaList.get(position);
         holder.title.setText(mangaItem.getTitle());
         Glide.with(holder.itemView.getContext())
                 .load(mangaItem.getImgUrl())
@@ -60,8 +59,8 @@ public class LikeAdapter extends RecyclerView.Adapter<LikeAdapter.LikeViewHolder
 
     @Override
     public int getItemCount() {
-        Log.d("LikeAdapter", "Item count: " + mangaItems.size());
-        return mangaItems.size();
+        Log.d("LikeAdapter", "Item count: " + mangaList.size());
+        return mangaList.size();
     }
 
     public static class LikeViewHolder extends RecyclerView.ViewHolder {
