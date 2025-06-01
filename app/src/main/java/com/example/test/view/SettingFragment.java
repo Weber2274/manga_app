@@ -8,7 +8,6 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
 import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.ScrollView;
@@ -23,65 +22,63 @@ import com.example.test.R;
 import com.example.test.model.SessionManager;
 import com.example.test.model.Setting;
 import com.example.test.viewmodel.SettingViewModel;
+import com.google.firebase.firestore.FirebaseFirestore;
+
+import java.util.HashMap;
+import java.util.Map;
 
 public class SettingFragment extends Fragment {
 
-    private LinearLayout notLoginLayout, layoutProfileContent;
+    private LinearLayout notLoginLayout, profileContent;
     private ScrollView userInfoLayout;
-    private TextView tvProfileArrow, tvNickname, tvPhone, tvEmail, tvProvince, tvCity, tvArea, tvPoints;
-    private Switch switchNightMode;
+    private TextView tvArrow, tvNick, tvPhone, tvEmail, tvProvince, tvCity, tvArea, tvPoints;
+    private Switch nightSwitch;
 
-    private SettingViewModel viewModel;
-    private Setting currentSetting;
-    private boolean isProfileExpanded = false;
+    private SettingViewModel vm;
+    private Setting current;
+    private boolean expanded = false;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_setting, container, false);
-
         initViews(view);
-        initViewModel();
-        checkLoginStatus();
-
+        initVM();
+        checkLogin();
         return view;
     }
 
     private void initViews(View view) {
         notLoginLayout = view.findViewById(R.id.layout_not_login);
         userInfoLayout = view.findViewById(R.id.layout_user_info);
-        layoutProfileContent = view.findViewById(R.id.layout_profile_content);
-        tvProfileArrow = view.findViewById(R.id.tv_profile_arrow);
+        profileContent = view.findViewById(R.id.layout_profile_content);
+        tvArrow = view.findViewById(R.id.tv_profile_arrow);
 
-        tvNickname = view.findViewById(R.id.tv_nickname);
+        tvNick = view.findViewById(R.id.tv_nickname);
         tvPhone = view.findViewById(R.id.tv_phone);
         tvEmail = view.findViewById(R.id.tv_email);
         tvProvince = view.findViewById(R.id.tv_province);
         tvCity = view.findViewById(R.id.tv_city);
         tvArea = view.findViewById(R.id.tv_area);
         tvPoints = view.findViewById(R.id.tv_points);
-
-        switchNightMode = view.findViewById(R.id.switch_night_mode);
-
+        nightSwitch = view.findViewById(R.id.switch_night_mode);
 
         view.findViewById(R.id.btn_login).setOnClickListener(v ->
                 startActivity(new Intent(requireActivity(), LoginActivity.class)));
-
         view.findViewById(R.id.btn_logout).setOnClickListener(v -> logout());
-        view.findViewById(R.id.layout_profile_header).setOnClickListener(v -> toggleProfile());
-        view.findViewById(R.id.btn_edit_profile).setOnClickListener(v -> showEditDialog());
+        view.findViewById(R.id.layout_profile_header).setOnClickListener(v -> toggle());
+        view.findViewById(R.id.btn_edit_profile).setOnClickListener(v -> edit());
 
-        switchNightMode.setOnCheckedChangeListener((v, checked) -> {
-            saveNightMode(checked);
-            Toast.makeText(requireContext(), checked ? "已開啟夜間模式" : "已關閉夜間模式", Toast.LENGTH_SHORT).show();
+        nightSwitch.setOnCheckedChangeListener((v, checked) -> {
+            saveNight(checked);
+            Toast.makeText(requireContext(), checked ? "夜間模式開啟" : "夜間模式關閉", Toast.LENGTH_SHORT).show();
         });
-
-        loadNightMode();
+        loadNight();
     }
 
-    private void initViewModel() {
-        viewModel = new ViewModelProvider(this).get(SettingViewModel.class);
-        viewModel.getSettingData().observe(getViewLifecycleOwner(), this::displayUserInfo);
-        viewModel.getErrorMessage().observe(getViewLifecycleOwner(), error -> {
+    private void initVM() {
+        vm = new ViewModelProvider(this).get(SettingViewModel.class);
+        vm.getSettingData().observe(getViewLifecycleOwner(), this::display);
+        vm.getErrorMessage().observe(getViewLifecycleOwner(), error -> {
             if (error != null && !error.isEmpty()) {
                 Toast.makeText(requireContext(), error, Toast.LENGTH_SHORT).show();
             }
@@ -90,49 +87,105 @@ public class SettingFragment extends Fragment {
 
     private void logout() {
         SessionManager.logout(requireContext());
-        viewModel.clearData();
-        checkLoginStatus();
+        vm.clearData();
+        current = null;
+        checkLogin();
         Toast.makeText(requireContext(), "已登出", Toast.LENGTH_SHORT).show();
     }
 
-    //下拉個人資料攔
-    private void toggleProfile() {
-        isProfileExpanded = !isProfileExpanded;
-        layoutProfileContent.setVisibility(isProfileExpanded ? View.VISIBLE : View.GONE);
-        tvProfileArrow.setText(isProfileExpanded ? "▲" : "▼");
+    private void toggle() {
+        expanded = !expanded;
+        profileContent.setVisibility(expanded ? View.VISIBLE : View.GONE);
+        tvArrow.setText(expanded ? "▲" : "▼");
 
-        if (isProfileExpanded && currentSetting == null) {
-            String cookies = getPrefs().getString("cookie", "");
-            if (!cookies.isEmpty()) viewModel.loadUserSettings(cookies);
+        if (expanded && current == null && getPrefs().getBoolean("isLogin", false)) {
+            checkData();
         }
     }
 
-    private void displayUserInfo(Setting setting) {
-        if (setting != null) {
-            currentSetting = setting;
-            tvNickname.setText(setting.getNickname().isEmpty() ? "未設定" : setting.getNickname());
-            tvPhone.setText(setting.getPhone().isEmpty() ? "未設定" : setting.getPhone());
-            tvEmail.setText(setting.getEmail().isEmpty() ? "未設定" : setting.getEmail());
-            tvProvince.setText(setting.getProvince().isEmpty() ? "未設定" : setting.getProvince());
-            tvCity.setText(setting.getCity().isEmpty() ? "未設定" : setting.getCity());
-            tvArea.setText(setting.getArea().isEmpty() ? "未設定" : setting.getArea());
-            tvPoints.setText(setting.getPoints().isEmpty() ? "0" : setting.getPoints());
+    private void checkData() {
+        FirebaseFirestore.getInstance()
+                .collection("users").document("user1")
+                .collection("user_data1").document("profile")
+                .get()
+                .addOnSuccessListener(doc -> {
+                    if (doc.exists()) {
+                        parse(doc);
+                    } else {
+                        create();
+                    }
+                })
+                .addOnFailureListener(e -> create());
+    }
+
+    private void create() {
+        Map<String, Object> data = new HashMap<>();
+        data.put("nickname", "新用戶");
+        data.put("phone", "");
+        data.put("email", "");
+        data.put("province", "");
+        data.put("city", "");
+        data.put("area", "");
+        data.put("points", "0");
+
+        FirebaseFirestore.getInstance()
+                .collection("users").document("user1")
+                .collection("user_data1").document("profile")
+                .set(data)
+                .addOnSuccessListener(aVoid -> {
+                    Setting s = new Setting("新用戶", "", "0", "", "", "", "");
+                    display(s);
+                });
+    }
+
+    private void parse(com.google.firebase.firestore.DocumentSnapshot doc) {
+        String nick = doc.getString("nickname");
+        String phone = doc.getString("phone");
+        String email = doc.getString("email");
+        String province = doc.getString("province");
+        String city = doc.getString("city");
+        String area = doc.getString("area");
+        String points = doc.getString("points");
+
+        nick = nick != null ? nick : "";
+        phone = phone != null ? phone : "";
+        email = email != null ? email : "";
+        province = province != null ? province : "";
+        city = city != null ? city : "";
+        area = area != null ? area : "";
+        points = points != null ? points : "0";
+
+        Setting s = new Setting(nick, email, points, phone, province, city, area);
+        display(s);
+    }
+
+    private void display(Setting s) {
+        if (s != null) {
+            current = s;
+            tvNick.setText(s.getNickname().isEmpty() ? "未設定" : s.getNickname());
+            tvPhone.setText(s.getPhone().isEmpty() ? "未設定" : s.getPhone());
+            tvEmail.setText(s.getEmail().isEmpty() ? "未設定" : s.getEmail());
+            tvProvince.setText(s.getProvince().isEmpty() ? "未設定" : s.getProvince());
+            tvCity.setText(s.getCity().isEmpty() ? "未設定" : s.getCity());
+            tvArea.setText(s.getArea().isEmpty() ? "未設定" : s.getArea());
+            tvPoints.setText(s.getPoints().isEmpty() ? "0" : s.getPoints());
         }
     }
 
-    private void showEditDialog() {
+    private void edit() {
+        if (current == null) return;
 
         LinearLayout container = new LinearLayout(requireContext());
         container.setOrientation(LinearLayout.VERTICAL);
         container.setPadding(60, 40, 60, 40);
 
         EditText[] fields = {
-                createEditText("暱稱", currentSetting.getNickname()),
-                createEditText("手機", currentSetting.getPhone()),
-                createEditText("郵箱", currentSetting.getEmail()),
-                createEditText("省分", currentSetting.getProvince()),
-                createEditText("城市", currentSetting.getCity()),
-                createEditText("地區", currentSetting.getArea())
+                createField("暱稱", current.getNickname()),
+                createField("手機", current.getPhone()),
+                createField("郵箱", current.getEmail()),
+                createField("省份", current.getProvince()),
+                createField("城市", current.getCity()),
+                createField("地區", current.getArea())
         };
 
         for (EditText field : fields) container.addView(field);
@@ -141,44 +194,63 @@ public class SettingFragment extends Fragment {
                 .setTitle("編輯個人資料")
                 .setView(container)
                 .setPositiveButton("儲存", (dialog, which) -> {
-                    Setting newSetting = new Setting(
+                    Setting newS = new Setting(
                             fields[0].getText().toString().trim(),
                             fields[2].getText().toString().trim(),
-                            currentSetting.getPoints(),
+                            current.getPoints(),
                             fields[1].getText().toString().trim(),
                             fields[3].getText().toString().trim(),
                             fields[4].getText().toString().trim(),
                             fields[5].getText().toString().trim()
                     );
-                    String cookies = getPrefs().getString("cookie", "");
-                    if (!cookies.isEmpty()) viewModel.updateUserSettings(cookies, newSetting);
+                    update(newS);
                 })
                 .setNegativeButton("取消", null)
                 .show();
     }
 
-    private EditText createEditText(String hint, String text) {
-        EditText editText = new EditText(requireContext());
-        editText.setHint(hint);
-        editText.setText(text);
-        return editText;
+    private void update(Setting s) {
+        Map<String, Object> data = new HashMap<>();
+        data.put("nickname", s.getNickname());
+        data.put("phone", s.getPhone());
+        data.put("email", s.getEmail());
+        data.put("province", s.getProvince());
+        data.put("city", s.getCity());
+        data.put("area", s.getArea());
+        data.put("points", s.getPoints());
+
+        FirebaseFirestore.getInstance()
+                .collection("users").document("user1")
+                .collection("user_data1").document("profile")
+                .set(data)
+                .addOnSuccessListener(aVoid -> {
+                    display(s);
+                    Toast.makeText(requireContext(), "更新成功", Toast.LENGTH_SHORT).show();
+                });
     }
 
-    private void checkLoginStatus() {
-        boolean isLogin = getPrefs().getBoolean("isLogin", false);
-        notLoginLayout.setVisibility(isLogin ? View.GONE : View.VISIBLE);
-        userInfoLayout.setVisibility(isLogin ? View.VISIBLE : View.GONE);
+    private EditText createField(String hint, String text) {
+        EditText et = new EditText(requireContext());
+        et.setHint(hint);
+        et.setText(text != null ? text : "");
+        return et;
     }
 
-    private void loadNightMode() {
-        boolean isNightMode = requireActivity().getSharedPreferences("AppSettings", Context.MODE_PRIVATE)
+    private void checkLogin() {
+        boolean login = getPrefs().getBoolean("isLogin", false);
+        notLoginLayout.setVisibility(login ? View.GONE : View.VISIBLE);
+        userInfoLayout.setVisibility(login ? View.VISIBLE : View.GONE);
+    }
+
+    private void loadNight() {
+        boolean night = requireActivity().getSharedPreferences("AppSettings", Context.MODE_PRIVATE)
                 .getBoolean("night_mode", false);
-        switchNightMode.setChecked(isNightMode);
+        nightSwitch.setChecked(night);
     }
 
-    private void saveNightMode(boolean isNightMode) {
+    private void saveNight(boolean night) {
         requireActivity().getSharedPreferences("AppSettings", Context.MODE_PRIVATE)
-                .edit().putBoolean("night_mode", isNightMode).apply();
+                .edit().putBoolean("night_mode", night).apply();
     }
 
     private SharedPreferences getPrefs() {
@@ -188,6 +260,6 @@ public class SettingFragment extends Fragment {
     @Override
     public void onResume() {
         super.onResume();
-        checkLoginStatus();
+        checkLogin();
     }
 }
