@@ -6,6 +6,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
+import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
@@ -18,9 +19,12 @@ import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 import androidx.core.widget.NestedScrollView;
 import androidx.lifecycle.ViewModelProvider;
+import androidx.recyclerview.widget.GridLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
 import com.example.test.R;
+import com.example.test.adapter.ChapterAdapter;
 import com.example.test.viewmodel.MangaDetailViewModel;
 
 import java.util.ArrayList;
@@ -31,6 +35,7 @@ public class MangaDetailActivity extends AppCompatActivity {
     private TextView mangaTitle,author,region,year,status;
     private ProgressBar progressBar;
     private Toolbar toolbar;
+    private RecyclerView recyclerView;
     @SuppressLint({"SetTextI18n", "MissingInflatedId", "SetJavaScriptEnabled"})
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -49,6 +54,7 @@ public class MangaDetailActivity extends AppCompatActivity {
         region = findViewById(R.id.detail_region);
         year = findViewById(R.id.detail_year);
         status = findViewById(R.id.detail_status);
+        recyclerView = findViewById(R.id.chapter_recyclerview);
         String title = getIntent().getStringExtra("title");
         MangaDetailViewModel viewModel = new ViewModelProvider(this).get(MangaDetailViewModel.class);
         viewModel.loadMangaDetail(title);
@@ -72,6 +78,9 @@ public class MangaDetailActivity extends AppCompatActivity {
 
         });
 
+        ChapterAdapter adapter = new ChapterAdapter();
+        recyclerView.setLayoutManager(new GridLayoutManager(this, 3));
+        recyclerView.setAdapter(adapter);
         toolbar = findViewById(R.id.detail_toolbar);
         setSupportActionBar(toolbar);
         toolbar.setNavigationOnClickListener(v -> {
