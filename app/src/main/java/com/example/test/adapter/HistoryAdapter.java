@@ -18,7 +18,7 @@ import com.example.test.model.MangaItem;
 import java.util.ArrayList;
 import java.util.List;
 
-public class LikeAdapter extends RecyclerView.Adapter<LikeAdapter.LikeViewHolder> {
+public class HistoryAdapter extends RecyclerView.Adapter<HistoryAdapter.HistoryViewHolder> {
 
     private List<MangaItem> mangaList = new ArrayList<>();
     public interface OnItemClickListener {
@@ -37,14 +37,14 @@ public class LikeAdapter extends RecyclerView.Adapter<LikeAdapter.LikeViewHolder
 
     @NonNull
     @Override
-    public LikeViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+    public HistoryViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         View view = LayoutInflater.from(parent.getContext())
                 .inflate(R.layout.item_book, parent, false);
-        return new LikeViewHolder(view);
+        return new HistoryViewHolder(view);
     }
 
     @Override
-    public void onBindViewHolder(@NonNull LikeViewHolder holder, int position) {
+    public void onBindViewHolder(@NonNull HistoryViewHolder holder, int position) {
         MangaItem mangaItem = mangaList.get(position);
         holder.title.setText(mangaItem.getTitle());
         Glide.with(holder.itemView.getContext())
@@ -63,11 +63,11 @@ public class LikeAdapter extends RecyclerView.Adapter<LikeAdapter.LikeViewHolder
         return mangaList.size();
     }
 
-    public static class LikeViewHolder extends RecyclerView.ViewHolder {
+    public static class HistoryViewHolder extends RecyclerView.ViewHolder {
         TextView title;
         ImageView cover;
 
-        public LikeViewHolder(@NonNull View itemView) {
+        public HistoryViewHolder(@NonNull View itemView) {
             super(itemView);
             title = itemView.findViewById(R.id.textTitle);
             cover = itemView.findViewById(R.id.imageCover);

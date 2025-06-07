@@ -6,21 +6,22 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
+
 import androidx.fragment.app.Fragment;
+import androidx.lifecycle.LiveData;
+import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModelProvider;
-import androidx.recyclerview.widget.GridLayoutManager;
-import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
+import androidx.recyclerview.widget.*;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
-import com.example.test.R;
+import com.example.test.*;
 import com.example.test.adapter.LikeAdapter;
-import com.example.test.model.MangaItem;
-import com.example.test.repository.LikeRepository;
-import com.example.test.viewmodel.HomeViewModel;
+import com.example.test.model.Book;
 import com.example.test.viewmodel.LikeViewModel;
-import java.util.List;
+
 import com.google.android.material.bottomnavigation.BottomNavigationView;
+
+import java.util.List;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -31,30 +32,22 @@ public class LikeFragment extends Fragment {
     private LikeViewModel likeViewModel;
     private LikeAdapter likeAdapter;
     private SwipeRefreshLayout swipeRefreshLayout;
-    private TextView textView;
+    private TextView tv_like;
+    private RecyclerView recyclerView_like;
+    private final MutableLiveData<List<Book>> mangaItems = new MutableLiveData<>();
 
-    // TODO: Rename parameter arguments, choose names that match
-    // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
+    public LiveData<List<Book>> getMangaItems() {
+        return mangaItems;
+    }
+
     private static final String ARG_PARAM1 = "param1";
     private static final String ARG_PARAM2 = "param2";
-
-    // TODO: Rename and change types of parameters
     private String mParam1;
     private String mParam2;
 
     public LikeFragment() {
-        // Required empty public constructor
     }
 
-    /**
-     * Use this factory method to create a new instance of
-     * this fragment using the provided parameters.
-     *
-     * @param param1 Parameter 1.
-     * @param param2 Parameter 2.
-     * @return A new instance of fragment LikeFragment.
-     */
-    // TODO: Rename and change types and number of parameters
     public static LikeFragment newInstance(String param1, String param2) {
         LikeFragment fragment = new LikeFragment();
         Bundle args = new Bundle();
@@ -80,11 +73,19 @@ public class LikeFragment extends Fragment {
         likeViewModel = new ViewModelProvider(this).get(LikeViewModel.class);
         bottomNavigationView = requireActivity().findViewById(R.id.bottomNavigationView);
 
-        RecyclerView recyclerView = view.findViewById(R.id.like_recycleview);
+        swipeRefreshLayout = view.findViewById(R.id.swipe_refresh);
+        RecyclerView recyclerView = view.findViewById(R.id.history_recycleview);
+
         likeAdapter = new LikeAdapter();
         recyclerView.setLayoutManager(new GridLayoutManager(getContext(), 3));
         recyclerView.setAdapter(likeAdapter);
+
         likeViewModel.loadMangaData(requireContext());
+
+        swipeRefreshLayout.setOnRefreshListener(() -> {
+            likeViewModel.refreshMangaData(requireContext());  // 強制重新抓取
+        });
+
         likeViewModel.getMangaItems().observe(getViewLifecycleOwner(), mangaItems -> {
             swipeRefreshLayout.setRefreshing(false);
             if (mangaItems != null) {
@@ -92,10 +93,11 @@ public class LikeFragment extends Fragment {
             }
         });
 
-        swipeRefreshLayout = view.findViewById(R.id.swipe_refresh);
-
-        swipeRefreshLayout.setOnRefreshListener(() -> {
-            likeViewModel.refreshMangaData(requireContext());  // 強制重新抓取
+        likeAdapter.setOnItemClickListener(manga -> {
+            Intent intent = new Intent(requireActivity(), MangaDetailActivity.class);
+            String title = manga.getTitle();
+            intent.putExtra("title",title);
+            startActivity(intent);
         });
 
         return view;

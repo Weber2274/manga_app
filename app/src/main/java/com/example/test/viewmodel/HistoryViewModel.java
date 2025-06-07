@@ -7,17 +7,18 @@ import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
 import com.example.test.model.MangaItem;
+import com.example.test.repository.HistoryRepository;
 import com.example.test.repository.LikeRepository;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class LikeViewModel extends ViewModel {
+public class HistoryViewModel extends ViewModel {
 
     private final MutableLiveData<List<MangaItem>> mangaItems = new MutableLiveData<>();
-    private final LikeRepository likeRepository = LikeRepository.getInstance();
+    private final HistoryRepository historyRepository = HistoryRepository.getInstance();
 
-    public LikeViewModel() {
+    public HistoryViewModel() {
         mangaItems.setValue(new ArrayList<>());
     }
     public LiveData<List<MangaItem>> getMangaItems() {
@@ -26,7 +27,7 @@ public class LikeViewModel extends ViewModel {
     }
 
     public void loadMangaData(Context context) {
-        likeRepository.fetchAllMangaFromShelf(context, new LikeRepository.OnLikeLoadedListener() {
+        historyRepository.fetchAllMangaFromShelf(new HistoryRepository.OnLikeLoadedListener() {
             @Override
             public void onSuccess(List<MangaItem> mangaItemsList) {
                 mangaItems.postValue(mangaItemsList);
@@ -40,7 +41,7 @@ public class LikeViewModel extends ViewModel {
     }
 
     public void refreshMangaData(Context context) {
-        LikeRepository.getInstance().clearCache();
+        HistoryRepository.getInstance().clearCache();
         loadMangaData(context);
     }
 }

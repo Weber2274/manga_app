@@ -1,15 +1,27 @@
 package com.example.test.view;
 
+import android.content.Intent;
 import android.os.Bundle;
-
-import androidx.fragment.app.Fragment;
-
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.TextView;
 
-import com.example.test.R;
+import androidx.fragment.app.Fragment;
+import androidx.lifecycle.LiveData;
+import androidx.lifecycle.MutableLiveData;
+import androidx.lifecycle.ViewModelProvider;
+import androidx.recyclerview.widget.*;
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
+
+import com.example.test.*;
+import com.example.test.adapter.HistoryAdapter;
+import com.example.test.model.Book;
+import com.example.test.viewmodel.HistoryViewModel;
+
 import com.google.android.material.bottomnavigation.BottomNavigationView;
+
+import java.util.List;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -17,29 +29,25 @@ import com.google.android.material.bottomnavigation.BottomNavigationView;
  * create an instance of this fragment.
  */
 public class HistoryFragment extends Fragment {
+    private HistoryViewModel historyViewModel;
+    private HistoryAdapter historyAdapter;
+    private SwipeRefreshLayout swipeRefreshLayout;
+    private TextView tv_like;
+    private RecyclerView recyclerView_like;
+    private final MutableLiveData<List<Book>> mangaItems = new MutableLiveData<>();
 
-    // TODO: Rename parameter arguments, choose names that match
-    // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
+    public LiveData<List<Book>> getMangaItems() {
+        return mangaItems;
+    }
+
     private static final String ARG_PARAM1 = "param1";
     private static final String ARG_PARAM2 = "param2";
-
-    // TODO: Rename and change types of parameters
     private String mParam1;
     private String mParam2;
 
     public HistoryFragment() {
-        // Required empty public constructor
     }
 
-    /**
-     * Use this factory method to create a new instance of
-     * this fragment using the provided parameters.
-     *
-     * @param param1 Parameter 1.
-     * @param param2 Parameter 2.
-     * @return A new instance of fragment HistoryFragment.
-     */
-    // TODO: Rename and change types and number of parameters
     public static HistoryFragment newInstance(String param1, String param2) {
         HistoryFragment fragment = new HistoryFragment();
         Bundle args = new Bundle();
@@ -58,14 +66,41 @@ public class HistoryFragment extends Fragment {
         }
     }
     private BottomNavigationView bottomNavigationView;
-
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                             Bundle savedInstanceState) {
+    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+        View view = inflater.inflate(R.layout.fragment_like, container, false);
+
+        historyViewModel = new ViewModelProvider(this).get(HistoryViewModel.class);
         bottomNavigationView = requireActivity().findViewById(R.id.bottomNavigationView);
 
-        // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_history, container, false);
+        swipeRefreshLayout = view.findViewById(R.id.swipe_refresh);
+        RecyclerView recyclerView = view.findViewById(R.id.history_recycleview);
+
+        historyAdapter = new HistoryAdapter();
+        recyclerView.setLayoutManager(new GridLayoutManager(getContext(), 3));
+        recyclerView.setAdapter(historyAdapter);
+
+        historyViewModel.loadMangaData(requireContext());
+
+        swipeRefreshLayout.setOnRefreshListener(() -> {
+            historyViewModel.refreshMangaData(requireContext());
+        });
+
+        historyViewModel.getMangaItems().observe(getViewLifecycleOwner(), mangaItems -> {
+            swipeRefreshLayout.setRefreshing(false);
+            if (mangaItems != null) {
+                historyAdapter.setMangas(mangaItems);
+            }
+        });
+
+        historyAdapter.setOnItemClickListener(manga -> {
+            Intent intent = new Intent(requireActivity(), MangaDetailActivity.class);
+            String title = manga.getTitle();
+            intent.putExtra("title",title);
+            startActivity(intent);
+        });
+
+        return view;
     }
 
     @Override

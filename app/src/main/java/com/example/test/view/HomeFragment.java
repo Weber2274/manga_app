@@ -80,8 +80,6 @@ public class HomeFragment extends Fragment {
     private RecyclerView recyclerView;
     private HomeAdapter adapter;
     private Button btnLogin;
-    private Button btnHistory;
-    private Button btnLike;
     HomeViewModel viewModel;
     private ProgressBar loading;
     private BottomNavigationView bottomNavigationView;
@@ -93,8 +91,6 @@ public class HomeFragment extends Fragment {
         View view = inflater.inflate(R.layout.fragment_home, container, false);
         btnLogin = view.findViewById(R.id.login_btn);
         loading = view.findViewById(R.id.progressBar);
-        btnHistory = view.findViewById(R.id.history_btn);
-        btnLike = view.findViewById(R.id.favorite_btn);
         bottomNavigationView = requireActivity().findViewById(R.id.bottomNavigationView);
 
 
@@ -113,20 +109,6 @@ public class HomeFragment extends Fragment {
                     updateLoginButton();
 
                 }
-            }
-        });
-
-        btnLike.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                setCurrentFragment(likeFragment);
-            }
-        });
-
-        btnHistory.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                setCurrentFragment(historyFragment);
             }
         });
 

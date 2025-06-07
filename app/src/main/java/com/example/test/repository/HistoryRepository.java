@@ -1,6 +1,5 @@
 package com.example.test.repository;
 
-import android.content.Context;
 import android.util.Log;
 
 import com.example.test.model.MangaItem;
@@ -13,15 +12,14 @@ import com.google.firebase.firestore.*;
 import java.util.ArrayList;
 import java.util.List;
 
-public class LikeRepository {
-    private static LikeRepository instance;
+public class HistoryRepository {
+    private static HistoryRepository instance;
 
-    // 快取已收藏漫畫
     private final List<MangaItem> cache = new ArrayList<>();
 
-    public static synchronized LikeRepository getInstance() {
+    public static synchronized HistoryRepository getInstance() {
         if (instance == null) {
-            instance = new LikeRepository();
+            instance = new HistoryRepository();
         }
         return instance;
     }
@@ -31,7 +29,7 @@ public class LikeRepository {
         void onError(String error);
     }
 
-    public void fetchAllMangaFromShelf(Context context, OnLikeLoadedListener listener) {
+    public void fetchAllMangaFromShelf(OnLikeLoadedListener listener) {
         FirebaseFirestore db = FirebaseFirestore.getInstance();
         FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
 
@@ -42,7 +40,7 @@ public class LikeRepository {
 
         db.collection("users")
                 .document(user.getUid())
-                .collection("favorites")
+                .collection("history")
                 .get()
                 .addOnSuccessListener(snapshot -> {
                     List<Task<DocumentSnapshot>> tasks = new ArrayList<>();
@@ -63,7 +61,7 @@ public class LikeRepository {
 
                                 String title = comicDoc.getString("title");
                                 String cover = "https:" + comicDoc.getString("cover");
-                                Log.d("LikeRepository", title);
+                                Log.d("HistoryRepository", title);
 
                                 if (title != null && cover != null) {
                                     MangaItem item = new MangaItem(title, cover);
@@ -77,13 +75,13 @@ public class LikeRepository {
                         listener.onSuccess(list);
 
                     }).addOnFailureListener(e -> {
-                        Log.e("LikeRepository", "漫畫資料讀取失敗", e);
+                        Log.e("HistoryRepository", "漫畫資料讀取失敗", e);
                         listener.onError("漫畫資料讀取失敗：" + e.getMessage());
                     });
 
                 }).addOnFailureListener(e -> {
-                    Log.e("LikeRepository", "收藏清單讀取失敗", e);
-                    listener.onError("收藏清單讀取失敗：" + e.getMessage());
+                    Log.e("HistoryRepository", "歷史清單讀取失敗", e);
+                    listener.onError("歷史清單讀取失敗：" + e.getMessage());
                 });
     }
     public void clearCache() {
