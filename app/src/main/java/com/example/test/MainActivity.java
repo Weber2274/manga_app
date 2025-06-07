@@ -25,6 +25,9 @@ import com.example.test.view.LikeFragment;
 import com.example.test.view.LoginActivity;
 import com.example.test.view.SettingFragment;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
+import com.google.firebase.FirebaseApp;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 
 public class MainActivity extends AppCompatActivity {
     private ActivityResultLauncher<Intent> loginLauncher;
@@ -51,6 +54,15 @@ public class MainActivity extends AppCompatActivity {
                 }
         );
 
+        Intent intent = getIntent();
+        if (intent != null && intent.hasExtra("target")) {
+            int targetId = intent.getIntExtra("target", R.id.nav_home);
+            bottomNavigationView.setSelectedItemId(targetId);
+            handleNavigation(targetId);
+        }
+
+        FirebaseApp.initializeApp(this);
+
         EdgeToEdge.enable(this);
         setContentView(R.layout.activity_main);
 
@@ -76,8 +88,8 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private boolean handleNavigation(int itemId) {
-        SharedPreferences prefs = getSharedPreferences("Myprefs", MODE_PRIVATE);
-        boolean isLogin = prefs.getBoolean("isLogin", false);
+        FirebaseUser currentUser = FirebaseAuth.getInstance().getCurrentUser();
+        boolean isLogin = (currentUser != null);
 
         if (itemId == R.id.nav_home) {
             setCurrentFragment(homeFragment);

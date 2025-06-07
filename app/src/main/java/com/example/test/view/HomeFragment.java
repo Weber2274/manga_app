@@ -23,10 +23,11 @@ import com.example.test.R;
 import com.example.test.adapter.CategoryAdapter;
 import com.example.test.adapter.HomeAdapter;
 import com.example.test.model.MangaItem;
-import com.example.test.model.SessionManager;
 //import com.example.test.viewmodel.HomeViewModel;
 import com.example.test.viewmodel.HomeViewModel;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -43,6 +44,8 @@ public class HomeFragment extends Fragment {
     // TODO: Rename and change types of parameters
     private String mParam1;
     private String mParam2;
+    private final Fragment historyFragment = HistoryFragment.newInstance("", "");
+    private final Fragment likeFragment = LikeFragment.newInstance("", "");
 
     public HomeFragment() {
         // Required empty public constructor
@@ -98,16 +101,15 @@ public class HomeFragment extends Fragment {
         btnLogin.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                SharedPreferences prefs = requireActivity().getSharedPreferences("Myprefs", Context.MODE_PRIVATE);
-                SharedPreferences.Editor editor = prefs.edit();
-                boolean isLogin = prefs.getBoolean("isLogin", false);
+                FirebaseUser currentUser = FirebaseAuth.getInstance().getCurrentUser();
+                boolean isLogin = (currentUser != null);
 
                 if (!isLogin) {
                     updateLoginButton();
                     Intent intent = new Intent(requireActivity(), LoginActivity.class);
                     startActivity(intent);
                 } else {
-                    SessionManager.logout(requireContext());
+                    FirebaseAuth.getInstance().signOut();
                     updateLoginButton();
 
                 }
@@ -117,14 +119,14 @@ public class HomeFragment extends Fragment {
         btnLike.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                setCurrentFragment(LikeFragment.newInstance("",""));
+                setCurrentFragment(likeFragment);
             }
         });
 
         btnHistory.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                setCurrentFragment(HistoryFragment.newInstance("",""));
+                setCurrentFragment(historyFragment);
             }
         });
 
@@ -188,8 +190,8 @@ public class HomeFragment extends Fragment {
     }
 
     private void updateLoginButton() {
-        SharedPreferences prefs = requireActivity().getSharedPreferences("Myprefs", MODE_PRIVATE);
-        boolean isLogin = prefs.getBoolean("isLogin", false);
+        FirebaseUser currentUser = FirebaseAuth.getInstance().getCurrentUser();
+        boolean isLogin = (currentUser != null);
         if (isLogin) {
             btnLogin.setText("登出");
         } else {
