@@ -1,7 +1,10 @@
 package com.example.test.view;
 
 import android.annotation.SuppressLint;
+import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 import android.webkit.WebView;
@@ -10,6 +13,8 @@ import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
+import android.widget.Toast;
+
 import androidx.appcompat.widget.Toolbar;
 
 import androidx.activity.EdgeToEdge;
@@ -26,16 +31,24 @@ import com.bumptech.glide.Glide;
 import com.example.test.R;
 import com.example.test.adapter.ChapterAdapter;
 import com.example.test.viewmodel.MangaDetailViewModel;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.firestore.DocumentReference;
+import com.google.firebase.firestore.FirebaseFirestore;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class MangaDetailActivity extends AppCompatActivity {
     private ImageView imgCover;
     private TextView mangaTitle,author,region,year,status;
     private ProgressBar progressBar;
     private Toolbar toolbar;
+    private Button like;
     private RecyclerView recyclerView;
+    private String title;
     @SuppressLint({"SetTextI18n", "MissingInflatedId", "SetJavaScriptEnabled"})
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -55,7 +68,92 @@ public class MangaDetailActivity extends AppCompatActivity {
         year = findViewById(R.id.detail_year);
         status = findViewById(R.id.detail_status);
         recyclerView = findViewById(R.id.chapter_recyclerview);
-        String title = getIntent().getStringExtra("title");
+        title = getIntent().getStringExtra("title");
+
+        FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+        if (user != null) {
+            String uid = user.getUid();
+            DocumentReference favDocRef = FirebaseFirestore.getInstance()
+                    .collection("users").document(uid)
+                    .collection("favorites").document(title);
+
+            favDocRef.get().addOnSuccessListener(documentSnapshot -> {
+                if (documentSnapshot.exists()) {
+                    like.setText("已收藏");
+                } else {
+                    like.setText("收藏");
+                }
+            });
+        }
+
+        like = findViewById(R.id.btn_like);
+        like.setOnClickListener(view -> {
+
+            if (user != null) {
+                String uid = user.getUid();
+                FirebaseFirestore db = FirebaseFirestore.getInstance();
+                SharedPreferences prefs = getSharedPreferences("Myprefs", MODE_PRIVATE);
+                SharedPreferences.Editor editor = prefs.edit();
+
+                // 收藏資料夾下的這本漫畫的文件
+                DocumentReference favDocRef = db.collection("users")
+                        .document(uid)
+                        .collection("favorites")
+                        .document(title);
+
+                // 先檢查是否已收藏（依據文件是否存在）
+                favDocRef.get().addOnSuccessListener(documentSnapshot -> {
+                    if (documentSnapshot.exists()) {
+                        // ❌ 已收藏 ➜ 執行取消收藏
+                        favDocRef.delete()
+                                .addOnSuccessListener(aVoid -> {
+                                    like.setText("收藏");
+                                    editor.putBoolean("isFavorited_" + title, false);
+                                    editor.apply();
+                                    Log.d("Favorite", "取消收藏成功");
+                                })
+                                .addOnFailureListener(e -> {
+                                    Log.e("Favorite", "取消收藏失敗", e);
+                                });
+                    } else {
+                        // ✅ 尚未收藏 ➜ 查找對應漫畫的 DocumentReference
+                        db.collection("comics")
+                                .whereEqualTo("title", title)
+                                .limit(1)
+                                .get()
+                                .addOnSuccessListener(querySnapshot -> {
+                                    if (!querySnapshot.isEmpty()) {
+                                        DocumentReference comicRef = querySnapshot.getDocuments()
+                                                .get(0).getReference();
+
+                                        Map<String, Object> data = new HashMap<>();
+                                        data.put("comic", comicRef);
+
+                                        favDocRef.set(data)
+                                                .addOnSuccessListener(aVoid -> {
+                                                    like.setText("已收藏");
+                                                    editor.putBoolean("isFavorited_" + title, true);
+                                                    editor.apply();
+                                                    Log.d("Favorite", "收藏成功");
+                                                })
+                                                .addOnFailureListener(e -> {
+                                                    Log.e("Favorite", "收藏失敗", e);
+                                                });
+                                    } else {
+                                        Toast.makeText(this, "找不到該漫畫", Toast.LENGTH_SHORT).show();
+                                    }
+                                });
+                    }
+                });
+
+            } else {
+                // 未登入 ➜ 導向登入頁面
+                Toast.makeText(MangaDetailActivity.this, "請先登入才能使用收藏功能", Toast.LENGTH_SHORT).show();
+                Intent intent = new Intent(MangaDetailActivity.this, LoginActivity.class);
+                startActivity(intent);
+            }
+        });
+
         MangaDetailViewModel viewModel = new ViewModelProvider(this).get(MangaDetailViewModel.class);
         viewModel.loadMangaDetail(title);
         viewModel.getLoading().observe(this, isLoading -> {
@@ -88,5 +186,25 @@ public class MangaDetailActivity extends AppCompatActivity {
         });
         
 
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+        if (user != null) {
+            String uid = user.getUid();
+            DocumentReference favDocRef = FirebaseFirestore.getInstance()
+                    .collection("users").document(uid)
+                    .collection("favorites").document(title);
+
+            favDocRef.get().addOnSuccessListener(documentSnapshot -> {
+                if (documentSnapshot.exists()) {
+                    like.setText("已收藏");
+                } else {
+                    like.setText("收藏");
+                }
+            });
+        }
     }
 }
