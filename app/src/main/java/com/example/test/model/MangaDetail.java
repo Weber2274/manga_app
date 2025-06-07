@@ -9,15 +9,16 @@ public class MangaDetail {
     private String year;
     private String area;
     private String status;
-    private List<String> pageTitle;
-    public MangaDetail(String coverImg, String title, String author, String year, String area, String status, List<String> pageTitle) {
+    private String id;
+    public MangaDetail(String id, String coverImg, String title, String author, String year, String area, String status) {
+        this.id = id;
         this.coverImg = coverImg;
         this.title = title;
         this.author = author;
         this.year = year;
         this.area = area;
         this.status = status;
-        this.pageTitle = pageTitle;
+
     }
 
     public String getCoverImg() {
@@ -41,7 +42,7 @@ public class MangaDetail {
         return status;
     }
 
-    public List<String> getPageTitle(){return pageTitle;}
+    public String getId(){return id;}
 
 
 }

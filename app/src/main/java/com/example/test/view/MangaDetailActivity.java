@@ -1,6 +1,7 @@
 package com.example.test.view;
 
 import android.annotation.SuppressLint;
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 import android.view.ViewGroup;
@@ -56,6 +57,7 @@ public class MangaDetailActivity extends AppCompatActivity {
         status = findViewById(R.id.detail_status);
         recyclerView = findViewById(R.id.chapter_recyclerview);
         String title = getIntent().getStringExtra("title");
+
         MangaDetailViewModel viewModel = new ViewModelProvider(this).get(MangaDetailViewModel.class);
         viewModel.loadMangaDetail(title);
         viewModel.getLoading().observe(this, isLoading -> {
@@ -65,9 +67,10 @@ public class MangaDetailActivity extends AppCompatActivity {
                 progressBar.setVisibility(View.GONE);
             }
         });
-
+        String[] comicId = new String[1];
         viewModel.getMangaDetailLiveData().observe(this, mangaDetail -> {
             if(mangaDetail != null){
+                comicId[0] = mangaDetail.getId();
                 Glide.with(this).load(mangaDetail.getCoverImg()).into(imgCover);
                 mangaTitle.setText(mangaDetail.getTitle());
                 author.setText("作者: " + mangaDetail.getAuthor());
@@ -79,8 +82,15 @@ public class MangaDetailActivity extends AppCompatActivity {
         });
 
         ChapterAdapter adapter = new ChapterAdapter();
+        adapter.setOnItemClickListener(chapterNumber -> {
+            Intent intent = new Intent(MangaDetailActivity.this, ChapterActivity.class);
+            intent.putExtra("comicId", comicId[0]);
+            intent.putExtra("chapter", chapterNumber);
+            startActivity(intent);
+        });
         recyclerView.setLayoutManager(new GridLayoutManager(this, 3));
         recyclerView.setAdapter(adapter);
+
         toolbar = findViewById(R.id.detail_toolbar);
         setSupportActionBar(toolbar);
         toolbar.setNavigationOnClickListener(v -> {

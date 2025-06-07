@@ -17,16 +17,16 @@ import java.util.List;
 public class ChapterAdapter extends RecyclerView.Adapter<ChapterAdapter.ViewHolder>{
     private final List<String> chapterList;
     public interface OnItemClickListener {
-//        void onItemClick();
+        void onItemClick(int chapterNum);
     }
-    private CategoryAdapter.OnItemClickListener listener;
-    public void setOnItemClickListener(CategoryAdapter.OnItemClickListener listener) {
+    private OnItemClickListener listener;
+    public void setOnItemClickListener(OnItemClickListener listener) {
         this.listener = listener;
     }
     public ChapterAdapter() {
         chapterList = new ArrayList<>();
-        for (int i = 1; i <= 12; i++) {
-            chapterList.add("第 " + i + " 集");
+        for (int i = 1; i <= 48; i++) {
+            chapterList.add("第 " + i + " 話");
         }
     }
 
@@ -45,7 +45,7 @@ public class ChapterAdapter extends RecyclerView.Adapter<ChapterAdapter.ViewHold
 
         holder.btnChapter.setOnClickListener(v -> {
             if(listener != null){
-//                listener.onItemClick();
+                listener.onItemClick(position + 1);
             }
         });
     }
