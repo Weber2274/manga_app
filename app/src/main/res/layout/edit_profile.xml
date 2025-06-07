@@ -1,0 +1,132 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="20dp">
+
+        <!-- 暱稱 -->
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="暱稱"
+            android:textSize="14sp"
+            android:textColor="#666666"
+            android:layout_marginBottom="4dp" />
+
+        <EditText
+            android:id="@+id/et_nickname"
+            android:layout_width="match_parent"
+            android:layout_height="48dp"
+            android:hint="請輸入暱稱"
+            android:inputType="text"
+            android:maxLength="20"
+            android:background="#f0f0f0"
+            android:padding="12dp"
+            android:layout_marginBottom="16dp" />
+
+        <!-- 手機 -->
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="手機號碼"
+            android:textSize="14sp"
+            android:textColor="#666666"
+            android:layout_marginBottom="4dp" />
+
+        <EditText
+            android:id="@+id/et_phone"
+            android:layout_width="match_parent"
+            android:layout_height="48dp"
+            android:hint="請輸入手機號碼"
+            android:inputType="phone"
+            android:maxLength="15"
+            android:background="#f0f0f0"
+            android:padding="12dp"
+            android:layout_marginBottom="16dp" />
+
+        <!-- 郵箱 -->
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="電子郵箱"
+            android:textSize="14sp"
+            android:textColor="#666666"
+            android:layout_marginBottom="4dp" />
+
+        <EditText
+            android:id="@+id/et_email"
+            android:layout_width="match_parent"
+            android:layout_height="48dp"
+            android:hint="請輸入電子郵箱"
+            android:inputType="textEmailAddress"
+            android:maxLength="50"
+            android:background="#f0f0f0"
+            android:padding="12dp"
+            android:layout_marginBottom="16dp" />
+
+        <!-- 省份 -->
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="省份"
+            android:textSize="14sp"
+            android:textColor="#666666"
+            android:layout_marginBottom="4dp" />
+
+        <EditText
+            android:id="@+id/et_province"
+            android:layout_width="match_parent"
+            android:layout_height="48dp"
+            android:hint="請輸入省份"
+            android:inputType="text"
+            android:maxLength="20"
+            android:background="#f0f0f0"
+            android:padding="12dp"
+            android:layout_marginBottom="16dp" />
+
+        <!-- 城市 -->
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="城市"
+            android:textSize="14sp"
+            android:textColor="#666666"
+            android:layout_marginBottom="4dp" />
+
+        <EditText
+            android:id="@+id/et_city"
+            android:layout_width="match_parent"
+            android:layout_height="48dp"
+            android:hint="請輸入城市"
+            android:inputType="text"
+            android:maxLength="20"
+            android:background="#f0f0f0"
+            android:padding="12dp"
+            android:layout_marginBottom="16dp" />
+
+        <!-- 地區 -->
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="詳細地址"
+            android:textSize="14sp"
+            android:textColor="#666666"
+            android:layout_marginBottom="4dp" />
+
+        <EditText
+            android:id="@+id/et_area"
+            android:layout_width="match_parent"
+            android:layout_height="48dp"
+            android:hint="請輸入詳細地址"
+            android:inputType="text"
+            android:maxLength="100"
+            android:background="#f0f0f0"
+            android:padding="12dp" />
+
+    </LinearLayout>
+</ScrollView>

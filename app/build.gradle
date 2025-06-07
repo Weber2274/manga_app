@@ -1,4 +1,5 @@
 plugins {
+
     alias(libs.plugins.androidApplication)
     id 'com.google.gms.google-services'
 }
@@ -45,6 +46,9 @@ dependencies {
     implementation libs.legacy.support.v4
     implementation libs.lifecycle.viewmodel.android
     testImplementation libs.junit
+    implementation platform('com.google.firebase:firebase-bom:33.14.0')
+    implementation 'com.google.firebase:firebase-auth'
+    implementation 'com.google.firebase:firebase-firestore'
     androidTestImplementation libs.ext.junit
     androidTestImplementation libs.espresso.core
     implementation 'org.jsoup:jsoup:1.15.4'
