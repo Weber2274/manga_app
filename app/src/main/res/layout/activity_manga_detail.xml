@@ -116,12 +116,12 @@
 
             </LinearLayout>
 
-            <WebView
-                android:id="@+id/manga_chapter"
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/chapter_recyclerview"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="78dp"
-                android:overScrollMode="never" />
+                android:layout_height="match_parent"
+                android:layout_marginTop="75dp" />
+
         </LinearLayout>
     </androidx.core.widget.NestedScrollView>
 
