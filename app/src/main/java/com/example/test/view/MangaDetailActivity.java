@@ -6,9 +6,6 @@ import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
-import android.view.ViewGroup;
-import android.webkit.WebView;
-import android.webkit.WebViewClient;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
@@ -36,9 +33,7 @@ import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.FirebaseFirestore;
 
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 public class MangaDetailActivity extends AppCompatActivity {
@@ -79,7 +74,7 @@ public class MangaDetailActivity extends AppCompatActivity {
 
             favDocRef.get().addOnSuccessListener(documentSnapshot -> {
                 if (documentSnapshot.exists()) {
-                    like.setText("已收藏");
+                    like.setText("取消收藏");
                 } else {
                     like.setText("收藏");
                 }
@@ -95,16 +90,13 @@ public class MangaDetailActivity extends AppCompatActivity {
                 SharedPreferences prefs = getSharedPreferences("Myprefs", MODE_PRIVATE);
                 SharedPreferences.Editor editor = prefs.edit();
 
-                // 收藏資料夾下的這本漫畫的文件
                 DocumentReference favDocRef = db.collection("users")
                         .document(uid)
                         .collection("favorites")
                         .document(title);
 
-                // 先檢查是否已收藏（依據文件是否存在）
                 favDocRef.get().addOnSuccessListener(documentSnapshot -> {
                     if (documentSnapshot.exists()) {
-                        // ❌ 已收藏 ➜ 執行取消收藏
                         favDocRef.delete()
                                 .addOnSuccessListener(aVoid -> {
                                     like.setText("收藏");
@@ -116,7 +108,6 @@ public class MangaDetailActivity extends AppCompatActivity {
                                     Log.e("Favorite", "取消收藏失敗", e);
                                 });
                     } else {
-                        // ✅ 尚未收藏 ➜ 查找對應漫畫的 DocumentReference
                         db.collection("comics")
                                 .whereEqualTo("title", title)
                                 .limit(1)
@@ -131,7 +122,7 @@ public class MangaDetailActivity extends AppCompatActivity {
 
                                         favDocRef.set(data)
                                                 .addOnSuccessListener(aVoid -> {
-                                                    like.setText("已收藏");
+                                                    like.setText("取消收藏");
                                                     editor.putBoolean("isFavorited_" + title, true);
                                                     editor.apply();
                                                     Log.d("Favorite", "收藏成功");
@@ -147,12 +138,12 @@ public class MangaDetailActivity extends AppCompatActivity {
                 });
 
             } else {
-                // 未登入 ➜ 導向登入頁面
                 Toast.makeText(MangaDetailActivity.this, "請先登入才能使用收藏功能", Toast.LENGTH_SHORT).show();
                 Intent intent = new Intent(MangaDetailActivity.this, LoginActivity.class);
                 startActivity(intent);
             }
         });
+        String title = getIntent().getStringExtra("title");
 
         MangaDetailViewModel viewModel = new ViewModelProvider(this).get(MangaDetailViewModel.class);
         viewModel.loadMangaDetail(title);
@@ -163,9 +154,10 @@ public class MangaDetailActivity extends AppCompatActivity {
                 progressBar.setVisibility(View.GONE);
             }
         });
-
+        String[] comicId = new String[1];
         viewModel.getMangaDetailLiveData().observe(this, mangaDetail -> {
             if(mangaDetail != null){
+                comicId[0] = mangaDetail.getId();
                 Glide.with(this).load(mangaDetail.getCoverImg()).into(imgCover);
                 mangaTitle.setText(mangaDetail.getTitle());
                 author.setText("作者: " + mangaDetail.getAuthor());
@@ -177,8 +169,15 @@ public class MangaDetailActivity extends AppCompatActivity {
         });
 
         ChapterAdapter adapter = new ChapterAdapter();
+        adapter.setOnItemClickListener(chapterNumber -> {
+            Intent intent = new Intent(MangaDetailActivity.this, ChapterActivity.class);
+            intent.putExtra("comicId", comicId[0]);
+            intent.putExtra("chapter", chapterNumber);
+            startActivity(intent);
+        });
         recyclerView.setLayoutManager(new GridLayoutManager(this, 3));
         recyclerView.setAdapter(adapter);
+
         toolbar = findViewById(R.id.detail_toolbar);
         setSupportActionBar(toolbar);
         toolbar.setNavigationOnClickListener(v -> {
@@ -200,7 +199,7 @@ public class MangaDetailActivity extends AppCompatActivity {
 
             favDocRef.get().addOnSuccessListener(documentSnapshot -> {
                 if (documentSnapshot.exists()) {
-                    like.setText("已收藏");
+                    like.setText("取消收藏");
                 } else {
                     like.setText("收藏");
                 }

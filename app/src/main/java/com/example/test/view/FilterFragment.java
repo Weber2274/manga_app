@@ -67,7 +67,6 @@ public class FilterFragment extends Fragment {
             @Override
             public void onTabSelected(TabLayout.Tab tab) {
                 String category = tab.getText().toString();
-                Toast.makeText(getContext(), category , Toast.LENGTH_SHORT).show();
                 adapter.setMangas(null);
                 viewModel.loadCategory(category);
             }

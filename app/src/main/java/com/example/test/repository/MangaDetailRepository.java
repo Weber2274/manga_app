@@ -35,12 +35,13 @@ public class MangaDetailRepository {
                 .addOnSuccessListener(querySnapshot -> {
                     MangaDetail mangaDetail = null;
                     for (QueryDocumentSnapshot document : querySnapshot) {
+                        String id = document.getId();
                         String imageUrl = "https:" + document.getString("cover");
                         String year = document.getString("year");
                         String area = document.getString("area");
                         String author = document.getString("author");
                         String status = document.getString("status");
-                        mangaDetail = new MangaDetail(imageUrl,title,author,year,area,status,null);
+                        mangaDetail = new MangaDetail(id,imageUrl,title,author,year,area,status);
                     }
 
                     listener.onSuccess(mangaDetail);
