@@ -254,10 +254,15 @@ public class MangaDetailActivity extends AppCompatActivity {
 
         toolbar = findViewById(R.id.detail_toolbar);
         setSupportActionBar(toolbar);
+        if (getSupportActionBar() != null) {
+            getSupportActionBar().setTitle(title);
+            getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        }
+
         toolbar.setNavigationOnClickListener(v -> {
             finish();
         });
-        
+
 
     }
 
