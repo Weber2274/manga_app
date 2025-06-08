@@ -17,7 +17,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class HomeViewModel extends ViewModel {
-    private MutableLiveData<List<ItemList>> flatListLiveData;
+    private MutableLiveData<List<MangaItem>> flatListLiveData;
     private MutableLiveData<Boolean> isLoading = new MutableLiveData<>();
     private HomeRepository homeRepository;
     private MutableLiveData<String> errorLiveData;
@@ -27,7 +27,7 @@ public class HomeViewModel extends ViewModel {
         errorLiveData = new MutableLiveData<>();
     }
 
-    public LiveData<List<ItemList>> getMangas() {
+    public LiveData<List<MangaItem>> getMangas() {
         return flatListLiveData;
     }
 
@@ -48,7 +48,7 @@ public class HomeViewModel extends ViewModel {
             @Override
             public void onSuccess(List<Book> books) {
                 isLoading.postValue(false);
-                List<ItemList> flatList = new ArrayList<>();
+                List<MangaItem> flatList = new ArrayList<>();
 
                 // 只處理第一組 MangaGroup，並略過分類標題
                 if (!books.isEmpty()) {

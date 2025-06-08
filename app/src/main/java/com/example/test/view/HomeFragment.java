@@ -17,6 +17,8 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.Toast;
 
@@ -31,6 +33,7 @@ import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
@@ -87,8 +90,10 @@ public class HomeFragment extends Fragment {
     private Button btnLogin, btnRandom;
     HomeViewModel viewModel;
     private ProgressBar loading;
+    private ImageView search;
+    private EditText searchText;
     private BottomNavigationView bottomNavigationView;
-    private List<ItemList> mangaItems;
+    private List<MangaItem> mangaItems;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -99,7 +104,8 @@ public class HomeFragment extends Fragment {
         btnRandom = view.findViewById(R.id.random_btn);
         loading = view.findViewById(R.id.progressBar);
         bottomNavigationView = requireActivity().findViewById(R.id.bottomNavigationView);
-
+        search = view.findViewById(R.id.search_icon);
+        searchText = view.findViewById(R.id.et_search);
 
         btnLogin.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -124,7 +130,7 @@ public class HomeFragment extends Fragment {
             public void onClick(View view) {
                 if (mangaItems != null && !mangaItems.isEmpty()) {
                     int randomIndex = new Random().nextInt(mangaItems.size());
-                    MangaItem randomItem = (MangaItem) mangaItems.get(randomIndex);
+                    MangaItem randomItem = mangaItems.get(randomIndex);
                     String title = randomItem.getTitle();
 
                     Intent intent = new Intent(getContext(), MangaDetailActivity.class);
@@ -136,6 +142,29 @@ public class HomeFragment extends Fragment {
             }
         });
 
+        search.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                String keyword = searchText.getText().toString().trim();
+                if (keyword.isEmpty()) {
+                    Toast.makeText(getContext(), "請輸入關鍵字", Toast.LENGTH_SHORT).show();
+                    adapter.setItems(mangaItems);
+                    return;
+                } else {
+                    List<MangaItem> filteredList = new ArrayList<>();
+                    for (MangaItem item : mangaItems) {
+                        if (item.getTitle().toLowerCase().contains(keyword.toLowerCase())) {
+                            filteredList.add(item);
+                        }
+                    }
+
+                    adapter.setItems(filteredList);
+                    if (filteredList.isEmpty()) {
+                        Toast.makeText(getContext(), "找不到相關漫畫", Toast.LENGTH_SHORT).show();
+                    }
+                }
+            }
+        });
         recyclerView = view.findViewById(R.id.home_recyclerView);
         adapter = new HomeAdapter();
         recyclerView.setAdapter(adapter);
@@ -175,6 +204,15 @@ public class HomeFragment extends Fragment {
             }
         });
         return view;
+    }
+
+    public void resetMangaList() {
+        if (adapter != null && mangaItems != null) {
+            adapter.setItems(mangaItems);
+        }
+        if (searchText != null) {
+            searchText.setText("");
+        }
     }
 
     @Override
