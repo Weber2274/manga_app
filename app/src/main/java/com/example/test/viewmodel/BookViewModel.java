@@ -5,7 +5,7 @@ import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
 
 import com.example.test.model.Book;
-import com.example.test.model.BookRepository;
+import com.example.test.repository.BookRepository;
 
 import java.util.List;
 

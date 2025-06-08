@@ -1,4 +1,8 @@
-package com.example.test.model;
+package com.example.test.repository;
+
+import android.util.Log;
+
+import com.example.test.model.Book;
 
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
@@ -11,7 +15,7 @@ import java.util.List;
 
 public class BookRepository {
     public interface OnBooksLoadedListener {
-        void onLoaded(List<Book> books);
+        void onLoaded(List<Book> mangases);
         void onError(String message);
     }
 
@@ -23,7 +27,7 @@ public class BookRepository {
                         .userAgent("Mozilla/5.0")
                         .get();
 
-                List<Book> books = new ArrayList<>();
+                List<Book> mangases = new ArrayList<>();
 
                 // 抓取最近更新的書籍列表（每本書都在 .book-list > li 裡）
                 Elements bookElements = doc.select(".latest-list ul li a.cover");
@@ -41,12 +45,12 @@ public class BookRepository {
                     if (!img.startsWith("http")) {
                         img = "https:" + img;
                     }
-
-                    books.add(new Book(title + "（" + update + "）", img, pageUrl));
+                    Log.d("BookRepository",title);
+//                    mangases.add(new Book(title + "（" + update + "）", img, pageUrl));
                 }
 
 
-                listener.onLoaded(books);
+                listener.onLoaded(mangases);
             } catch (IOException e) {
                 e.printStackTrace();
                 listener.onError("資料抓取失敗: " + e.getMessage());

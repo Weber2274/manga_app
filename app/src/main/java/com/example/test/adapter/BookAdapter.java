@@ -1,4 +1,4 @@
-package com.example.test.view;
+package com.example.test.adapter;
 
 import android.view.LayoutInflater;
 import android.view.View;
@@ -6,6 +6,7 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
@@ -19,22 +20,23 @@ public class BookAdapter extends RecyclerView.Adapter<BookAdapter.BookViewHolder
     private List<Book> bookList = new ArrayList<>();
     private OnBookClickListener listener;
 
-    public void setBooks(List<Book> books) {
-        this.bookList = books;
+    public void setBooks(List<Book> mangases) {
+        this.bookList = mangases;
         notifyDataSetChanged();
     }
     public void setOnBookClickListener(OnBookClickListener listener) {
         this.listener = listener;
     }
 
+    @NonNull
     @Override
-    public BookViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+    public BookViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_book, parent, false);
         return new BookViewHolder(view);
     }
 
     @Override
-    public void onBindViewHolder(BookViewHolder holder, int position) {
+    public void onBindViewHolder(@NonNull BookViewHolder holder, int position) {
         Book book = bookList.get(position);
         holder.title.setText(book.getTitle());
         Glide.with(holder.itemView.getContext()).load(book.getImageUrl()).into(holder.cover);
@@ -47,15 +49,13 @@ public class BookAdapter extends RecyclerView.Adapter<BookAdapter.BookViewHolder
     }
 
     @Override
-    public int getItemCount() {
-        return bookList.size();
-    }
+    public int getItemCount() { return bookList.size(); }
 
     public static class BookViewHolder extends RecyclerView.ViewHolder {
         TextView title;
         ImageView cover;
 
-        public BookViewHolder(View itemView) {
+        public BookViewHolder(@NonNull View itemView) {
             super(itemView);
             title = itemView.findViewById(R.id.textTitle);
             cover = itemView.findViewById(R.id.imageCover);
