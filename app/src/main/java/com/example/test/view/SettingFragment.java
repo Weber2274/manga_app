@@ -238,6 +238,7 @@ public class SettingFragment extends Fragment {
     }
 
     private void checkLogin() {
+        user = FirebaseAuth.getInstance().getCurrentUser();
         boolean login = (user != null);
         notLoginLayout.setVisibility(login ? View.GONE : View.VISIBLE);
         userInfoLayout.setVisibility(login ? View.VISIBLE : View.GONE);

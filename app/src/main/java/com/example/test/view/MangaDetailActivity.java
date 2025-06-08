@@ -68,10 +68,9 @@ public class MangaDetailActivity extends AppCompatActivity {
         read = findViewById(R.id.btn_read);
         FirebaseFirestore db = FirebaseFirestore.getInstance();
         FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
-        String uid = user.getUid();
         if (user != null) {
             DocumentReference favDocRef = FirebaseFirestore.getInstance()
-                    .collection("users").document(uid)
+                    .collection("users").document(user.getUid())
                     .collection("favorites").document(title);
 
             favDocRef.get().addOnSuccessListener(documentSnapshot -> {
@@ -89,7 +88,7 @@ public class MangaDetailActivity extends AppCompatActivity {
                 SharedPreferences.Editor editor = prefs.edit();
 
                 DocumentReference favDocRef = db.collection("users")
-                        .document(uid)
+                        .document(user.getUid())
                         .collection("favorites")
                         .document(title);
 
@@ -143,39 +142,40 @@ public class MangaDetailActivity extends AppCompatActivity {
 
         String[] comicId = new String[1];
         read.setOnClickListener(view -> {
-            DocumentReference historyDoc = db.collection("users")
-                    .document(uid)
-                    .collection("history")
-                    .document(title);
-            historyDoc.get().addOnSuccessListener(documentSnapshot -> {
-                if (documentSnapshot.exists()) {
-                    historyDoc.update("latest", "1")
-                            .addOnSuccessListener(aVoid -> Log.d("History", "最新章節已更新"))
-                            .addOnFailureListener(e -> Log.e("History", "更新 latest 失敗", e));
-                } else {
-                    db.collection("comics")
-                            .whereEqualTo("title", title)
-                            .limit(1)
-                            .get()
-                            .addOnSuccessListener(querySnapshot -> {
-                                if (!querySnapshot.isEmpty()) {
-                                    DocumentReference comicRef = querySnapshot.getDocuments()
-                                            .get(0).getReference();
+            if(user != null){
+                DocumentReference historyDoc = db.collection("users")
+                        .document(user.getUid())
+                        .collection("history")
+                        .document(title);
+                historyDoc.get().addOnSuccessListener(documentSnapshot -> {
+                    if (documentSnapshot.exists()) {
+                        historyDoc.update("latest", "1")
+                                .addOnSuccessListener(aVoid -> Log.d("History", "最新章節已更新"))
+                                .addOnFailureListener(e -> Log.e("History", "更新 latest 失敗", e));
+                    } else {
+                        db.collection("comics")
+                                .whereEqualTo("title", title)
+                                .limit(1)
+                                .get()
+                                .addOnSuccessListener(querySnapshot -> {
+                                    if (!querySnapshot.isEmpty()) {
+                                        DocumentReference comicRef = querySnapshot.getDocuments()
+                                                .get(0).getReference();
 
-                                    Map<String, Object> data = new HashMap<>();
-                                    data.put("comic", comicRef);
-                                    data.put("latest", "1");
+                                        Map<String, Object> data = new HashMap<>();
+                                        data.put("comic", comicRef);
+                                        data.put("latest", "1");
 
-                                    historyDoc.set(data)
-                                            .addOnSuccessListener(aVoid -> Log.d("History", "歷史紀錄已新增"))
-                                            .addOnFailureListener(e -> Log.e("History", "新增紀錄失敗", e));
-                                } else {
-                                    Toast.makeText(this, "找不到該漫畫", Toast.LENGTH_SHORT).show();
-                                }
-                            });
-                }
-            });
-
+                                        historyDoc.set(data)
+                                                .addOnSuccessListener(aVoid -> Log.d("History", "歷史紀錄已新增"))
+                                                .addOnFailureListener(e -> Log.e("History", "新增紀錄失敗", e));
+                                    } else {
+                                        Toast.makeText(this, "找不到該漫畫", Toast.LENGTH_SHORT).show();
+                                    }
+                                });
+                    }
+                });
+            }
             Intent intent = new Intent(MangaDetailActivity.this, ChapterActivity.class);
             intent.putExtra("comicId", comicId[0]);
             intent.putExtra("chapter", 1);
@@ -209,7 +209,7 @@ public class MangaDetailActivity extends AppCompatActivity {
         ChapterAdapter adapter = new ChapterAdapter();
         adapter.setOnItemClickListener(chapterNumber -> {
             DocumentReference historyDoc = db.collection("users")
-                    .document(uid)
+                    .document(user.getUid())
                     .collection("history")
                     .document(title);
             historyDoc.get().addOnSuccessListener(documentSnapshot -> {
