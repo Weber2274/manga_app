@@ -18,16 +18,21 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.ProgressBar;
+import android.widget.Toast;
 
 import com.example.test.R;
 import com.example.test.adapter.CategoryAdapter;
 import com.example.test.adapter.HomeAdapter;
+import com.example.test.model.ItemList;
 import com.example.test.model.MangaItem;
 //import com.example.test.viewmodel.HomeViewModel;
 import com.example.test.viewmodel.HomeViewModel;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+
+import java.util.List;
+import java.util.Random;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -79,10 +84,11 @@ public class HomeFragment extends Fragment {
     }
     private RecyclerView recyclerView;
     private HomeAdapter adapter;
-    private Button btnLogin;
+    private Button btnLogin, btnRandom;
     HomeViewModel viewModel;
     private ProgressBar loading;
     private BottomNavigationView bottomNavigationView;
+    private List<ItemList> mangaItems;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -90,6 +96,7 @@ public class HomeFragment extends Fragment {
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_home, container, false);
         btnLogin = view.findViewById(R.id.login_btn);
+        btnRandom = view.findViewById(R.id.random_btn);
         loading = view.findViewById(R.id.progressBar);
         bottomNavigationView = requireActivity().findViewById(R.id.bottomNavigationView);
 
@@ -108,6 +115,23 @@ public class HomeFragment extends Fragment {
                     FirebaseAuth.getInstance().signOut();
                     updateLoginButton();
 
+                }
+            }
+        });
+
+        btnRandom.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if (mangaItems != null && !mangaItems.isEmpty()) {
+                    int randomIndex = new Random().nextInt(mangaItems.size());
+                    MangaItem randomItem = (MangaItem) mangaItems.get(randomIndex);
+                    String title = randomItem.getTitle();
+
+                    Intent intent = new Intent(getContext(), MangaDetailActivity.class);
+                    intent.putExtra("title", title);
+                    startActivity(intent);
+                } else {
+                    Toast.makeText(getContext(), "尚未載入漫畫資料", Toast.LENGTH_SHORT).show();
                 }
             }
         });
@@ -140,6 +164,7 @@ public class HomeFragment extends Fragment {
             if (items != null) {
                 Log.d("HomeFragment", "Items loaded: " + items.size());
                 adapter.setItems(items);
+                mangaItems = items;
             }
         });
         viewModel.getIsLoading().observe(getViewLifecycleOwner(), isLoading -> {
