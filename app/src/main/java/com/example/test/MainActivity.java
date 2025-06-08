@@ -108,11 +108,7 @@ public class MainActivity extends AppCompatActivity {
                 setCurrentFragment(likeFragment);
             }
         } else if (itemId == R.id.nav_setting) {
-            if (!isLogin) {
-                navToLogin(this, R.id.nav_setting);
-            } else {
                 setCurrentFragment(settingFragment);
-            }
         } else {
             return false;
         }
