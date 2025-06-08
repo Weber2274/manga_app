@@ -2,9 +2,12 @@ package com.example.test.view;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import androidx.fragment.app.Fragment;
@@ -20,6 +23,8 @@ import com.example.test.model.Book;
 import com.example.test.viewmodel.LikeViewModel;
 
 import com.google.android.material.bottomnavigation.BottomNavigationView;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 
 import java.util.List;
 
@@ -32,6 +37,8 @@ public class LikeFragment extends Fragment {
     private LikeViewModel likeViewModel;
     private LikeAdapter likeAdapter;
     private SwipeRefreshLayout swipeRefreshLayout;
+    private LinearLayout notLoginLayout;
+    private Button loginButton;
     private TextView tv_like;
     private RecyclerView recyclerView_like;
     private final MutableLiveData<List<Book>> mangaItems = new MutableLiveData<>();
@@ -69,6 +76,12 @@ public class LikeFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_like, container, false);
+        notLoginLayout = view.findViewById(R.id.layout_not_login);
+        loginButton = view.findViewById(R.id.btn_login);
+        loginButton.setOnClickListener(v -> {
+            Log.d("LoginClick", "按下登入按鈕");
+            startActivity(new Intent(requireActivity(), LoginActivity.class));
+        });
 
         likeViewModel = new ViewModelProvider(this).get(LikeViewModel.class);
         bottomNavigationView = requireActivity().findViewById(R.id.bottomNavigationView);
@@ -83,7 +96,7 @@ public class LikeFragment extends Fragment {
         likeViewModel.loadMangaData(requireContext());
 
         swipeRefreshLayout.setOnRefreshListener(() -> {
-            likeViewModel.refreshMangaData(requireContext());  // 強制重新抓取
+            likeViewModel.refreshMangaData(requireContext());
         });
 
         likeViewModel.getMangaItems().observe(getViewLifecycleOwner(), mangaItems -> {
@@ -106,6 +119,12 @@ public class LikeFragment extends Fragment {
     @Override
     public void onResume() {
         super.onResume();
+
+        FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+        user = FirebaseAuth.getInstance().getCurrentUser();
+        boolean login = (user != null);
+        notLoginLayout.setVisibility(login ? View.GONE : View.VISIBLE);
+        swipeRefreshLayout.setVisibility(login ? View.VISIBLE : View.GONE);
 
         Fragment currentFragment = requireActivity().getSupportFragmentManager().findFragmentById(R.id.fragment_main);
         if (currentFragment instanceof HomeFragment) {

@@ -125,7 +125,7 @@ public class SettingFragment extends Fragment {
         data.put("points", "0");
 
         FirebaseFirestore.getInstance()
-                .collection("users").document("user1")
+                .collection("users").document(user.getUid())
                 .collection("user_data1").document("profile")
                 .set(data)
                 .addOnSuccessListener(aVoid -> {
@@ -258,5 +258,8 @@ public class SettingFragment extends Fragment {
     public void onResume() {
         super.onResume();
         checkLogin();
+        if (user != null) {
+            checkData();
+        }
     }
 }

@@ -49,32 +49,32 @@
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_weight="1"
-        android:orientation="vertical"
         android:gravity="center"
+        android:orientation="vertical"
         android:padding="32dp"
         android:visibility="gone">
 
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_marginBottom="16dp"
             android:text="🔒"
-            android:textSize="48sp"
-            android:layout_marginBottom="16dp" />
+            android:textSize="48sp" />
 
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_marginBottom="24dp"
             android:text="請先登入以查看設定"
-            android:textSize="16sp"
             android:textColor="#666666"
-            android:layout_marginBottom="24dp" />
+            android:textSize="16sp" />
 
         <Button
             android:id="@+id/btn_login"
             android:layout_width="200dp"
             android:layout_height="48dp"
-            android:text="登入"
             android:background="#2196F3"
+            android:text="登入"
             android:textColor="@android:color/white"
             android:textSize="16sp" />
 

@@ -28,7 +28,7 @@ import java.util.Map;
 public class HistoryAdapter extends RecyclerView.Adapter<HistoryAdapter.HistoryViewHolder> {
     FirebaseFirestore db = FirebaseFirestore.getInstance();
     FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
-    String uid = user.getUid();
+    String uid = "";
     private List<MangaItem> mangaList = new ArrayList<>();
     public interface OnItemClickListener {
         void onItemClick(MangaItem item);
@@ -65,6 +65,10 @@ public class HistoryAdapter extends RecyclerView.Adapter<HistoryAdapter.HistoryV
                 listener.onItemClick(mangaItem);
             }
         });
+        if (user != null) {
+            uid = user.getUid();
+        } else {
+        }
 
         DocumentReference historyDoc = db.collection("users")
                 .document(uid)

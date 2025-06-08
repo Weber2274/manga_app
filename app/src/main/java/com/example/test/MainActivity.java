@@ -100,19 +100,11 @@ public class MainActivity extends AppCompatActivity {
         } else if (itemId == R.id.nav_filter) {
             setCurrentFragment(filterFragment);
         } else if (itemId == R.id.nav_history) {
-            if (!isLogin) {
-                navToLogin(this, R.id.nav_history);
-            } else {
-                setCurrentFragment(historyFragment);
-            }
+            setCurrentFragment(historyFragment);
         } else if (itemId == R.id.nav_like) {
-            if (!isLogin) {
-                navToLogin(this, R.id.nav_like);
-            } else {
-                setCurrentFragment(likeFragment);
-            }
+            setCurrentFragment(likeFragment);
         } else if (itemId == R.id.nav_setting) {
-                setCurrentFragment(settingFragment);
+            setCurrentFragment(settingFragment);
         } else {
             return false;
         }
