@@ -93,6 +93,10 @@ public class MainActivity extends AppCompatActivity {
 
         if (itemId == R.id.nav_home) {
             setCurrentFragment(homeFragment);
+            if (homeFragment instanceof HomeFragment) {
+                ((HomeFragment) homeFragment).resetMangaList();
+            }
+
         } else if (itemId == R.id.nav_filter) {
             setCurrentFragment(filterFragment);
         } else if (itemId == R.id.nav_history) {

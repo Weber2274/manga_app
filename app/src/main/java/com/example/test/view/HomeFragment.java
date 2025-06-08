@@ -148,6 +148,7 @@ public class HomeFragment extends Fragment {
                 String keyword = searchText.getText().toString().trim();
                 if (keyword.isEmpty()) {
                     Toast.makeText(getContext(), "請輸入關鍵字", Toast.LENGTH_SHORT).show();
+                    adapter.setItems(mangaItems);
                     return;
                 } else {
                     List<MangaItem> filteredList = new ArrayList<>();
@@ -203,6 +204,15 @@ public class HomeFragment extends Fragment {
             }
         });
         return view;
+    }
+
+    public void resetMangaList() {
+        if (adapter != null && mangaItems != null) {
+            adapter.setItems(mangaItems);
+        }
+        if (searchText != null) {
+            searchText.setText("");
+        }
     }
 
     @Override
