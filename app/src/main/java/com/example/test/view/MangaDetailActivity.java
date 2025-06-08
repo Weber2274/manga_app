@@ -208,38 +208,41 @@ public class MangaDetailActivity extends AppCompatActivity {
 
         ChapterAdapter adapter = new ChapterAdapter();
         adapter.setOnItemClickListener(chapterNumber -> {
-            DocumentReference historyDoc = db.collection("users")
-                    .document(user.getUid())
-                    .collection("history")
-                    .document(title);
-            historyDoc.get().addOnSuccessListener(documentSnapshot -> {
-                if (documentSnapshot.exists()) {
-                    historyDoc.update("latest", Integer.toString(chapterNumber))
-                            .addOnSuccessListener(aVoid -> Log.d("History", "最新章節已更新"))
-                            .addOnFailureListener(e -> Log.e("History", "更新 latest 失敗", e));
-                } else {
-                    db.collection("comics")
-                            .whereEqualTo("title", title)
-                            .limit(1)
-                            .get()
-                            .addOnSuccessListener(querySnapshot -> {
-                                if (!querySnapshot.isEmpty()) {
-                                    DocumentReference comicRef = querySnapshot.getDocuments()
-                                            .get(0).getReference();
+            if(user != null){
+                DocumentReference historyDoc = db.collection("users")
+                        .document(user.getUid())
+                        .collection("history")
+                        .document(title);
+                historyDoc.get().addOnSuccessListener(documentSnapshot -> {
+                    if (documentSnapshot.exists()) {
+                        historyDoc.update("latest", Integer.toString(chapterNumber))
+                                .addOnSuccessListener(aVoid -> Log.d("History", "最新章節已更新"))
+                                .addOnFailureListener(e -> Log.e("History", "更新 latest 失敗", e));
+                    } else {
+                        db.collection("comics")
+                                .whereEqualTo("title", title)
+                                .limit(1)
+                                .get()
+                                .addOnSuccessListener(querySnapshot -> {
+                                    if (!querySnapshot.isEmpty()) {
+                                        DocumentReference comicRef = querySnapshot.getDocuments()
+                                                .get(0).getReference();
 
-                                    Map<String, Object> data = new HashMap<>();
-                                    data.put("comic", comicRef);
-                                    data.put("latest", Integer.toString(chapterNumber));
+                                        Map<String, Object> data = new HashMap<>();
+                                        data.put("comic", comicRef);
+                                        data.put("latest", Integer.toString(chapterNumber));
 
-                                    historyDoc.set(data)
-                                            .addOnSuccessListener(aVoid -> Log.d("History", "歷史紀錄已新增"))
-                                            .addOnFailureListener(e -> Log.e("History", "新增紀錄失敗", e));
-                                } else {
-                                    Toast.makeText(this, "找不到該漫畫", Toast.LENGTH_SHORT).show();
-                                }
-                            });
-                }
-            });
+                                        historyDoc.set(data)
+                                                .addOnSuccessListener(aVoid -> Log.d("History", "歷史紀錄已新增"))
+                                                .addOnFailureListener(e -> Log.e("History", "新增紀錄失敗", e));
+                                    } else {
+                                        Toast.makeText(this, "找不到該漫畫", Toast.LENGTH_SHORT).show();
+                                    }
+                                });
+                    }
+                });
+            }
+
 
             Intent intent = new Intent(MangaDetailActivity.this, ChapterActivity.class);
             intent.putExtra("comicId", comicId[0]);
