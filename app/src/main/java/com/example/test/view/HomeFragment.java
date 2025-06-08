@@ -16,6 +16,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
@@ -212,6 +213,13 @@ public class HomeFragment extends Fragment {
         }
         if (searchText != null) {
             searchText.setText("");
+        }
+        searchText.clearFocus();
+
+        // 隱藏鍵盤
+        InputMethodManager imm = (InputMethodManager) requireActivity().getSystemService(Context.INPUT_METHOD_SERVICE);
+        if (imm != null) {
+            imm.hideSoftInputFromWindow(searchText.getWindowToken(), 0);
         }
     }
 
