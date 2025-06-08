@@ -26,7 +26,6 @@ public class BookViewModel extends ViewModel {
 
             @Override
             public void onError(String message) {
-                // 可以額外提供錯誤 LiveData 處理
             }
         });
     }

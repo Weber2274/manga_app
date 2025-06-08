@@ -50,7 +50,6 @@ public class HomeViewModel extends ViewModel {
                 isLoading.postValue(false);
                 List<MangaItem> flatList = new ArrayList<>();
 
-                // 只處理第一組 MangaGroup，並略過分類標題
                 if (!books.isEmpty()) {
                     for (Book manga : books) {
                         flatList.add(new MangaItem(manga.getTitle(), manga.getImageUrl()));

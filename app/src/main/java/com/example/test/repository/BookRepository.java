@@ -22,14 +22,12 @@ public class BookRepository {
     public void fetchBooksFromUpdatePage(OnBooksLoadedListener listener) {
         new Thread(() -> {
             try {
-                // 直接連接更新頁面
                 Document doc = Jsoup.connect("https://tw.manhuagui.com/update/")
                         .userAgent("Mozilla/5.0")
                         .get();
 
                 List<Book> mangases = new ArrayList<>();
 
-                // 抓取最近更新的書籍列表（每本書都在 .book-list > li 裡）
                 Elements bookElements = doc.select(".latest-list ul li a.cover");
 
                 for (Element el : bookElements) {

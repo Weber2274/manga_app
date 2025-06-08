@@ -216,7 +216,6 @@ public class HomeFragment extends Fragment {
         }
         searchText.clearFocus();
 
-        // 隱藏鍵盤
         InputMethodManager imm = (InputMethodManager) requireActivity().getSystemService(Context.INPUT_METHOD_SERVICE);
         if (imm != null) {
             imm.hideSoftInputFromWindow(searchText.getWindowToken(), 0);

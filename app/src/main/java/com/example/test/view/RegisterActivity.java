@@ -65,7 +65,7 @@ public class RegisterActivity extends AppCompatActivity {
         auth.createUserWithEmailAndPassword(email, pass)
                 .addOnCompleteListener(task -> {
                     if (task.isSuccessful()) {
-                        FirebaseUser newUser = auth.getCurrentUser(); // 注意：這是 task 完成後才安全取得的
+                        FirebaseUser newUser = auth.getCurrentUser();
                         if (newUser == null) {
                             Toast.makeText(this, "註冊失敗：無法取得使用者資訊", Toast.LENGTH_SHORT).show();
                             return;

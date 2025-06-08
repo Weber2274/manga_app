@@ -20,9 +20,8 @@ public class HomeRepository {
         return instance;
     }
 
-    // ✅ 修改 callback interface：不再傳 MangaGroup，而是直接 List<Book>
     public interface OnHomePageLoadedListener {
-        void onSuccess(List<Book> allBooks);  // 修改這裡
+        void onSuccess(List<Book> allBooks);
         void onError(String error);
     }
 
@@ -42,7 +41,6 @@ public class HomeRepository {
                         allBooks.add(book);
                     }
 
-                    // ✅ 直接回傳 List<Book>
                     listener.onSuccess(allBooks);
                 })
                 .addOnFailureListener(e -> {

@@ -16,7 +16,6 @@ import java.util.List;
 public class LikeRepository {
     private static LikeRepository instance;
 
-    // 快取已收藏漫畫
     private final List<MangaItem> cache = new ArrayList<>();
 
     public static synchronized LikeRepository getInstance() {
