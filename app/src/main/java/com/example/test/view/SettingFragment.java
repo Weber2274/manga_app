@@ -33,7 +33,7 @@ public class SettingFragment extends Fragment {
     private LinearLayout notLoginLayout, profileContent;
     private ScrollView userInfoLayout;
     private TextView tvArrow, tvNick, tvPhone, tvEmail, tvProvince, tvCity, tvArea, tvPoints;
-    private Switch nightSwitch;
+//    private Switch nightSwitch;
 
     private SettingViewModel vm;
     private Setting current;
@@ -61,7 +61,6 @@ public class SettingFragment extends Fragment {
         tvCity = view.findViewById(R.id.tv_city);
         tvArea = view.findViewById(R.id.tv_area);
         tvPoints = view.findViewById(R.id.tv_points);
-        nightSwitch = view.findViewById(R.id.switch_night_mode);
 
         view.findViewById(R.id.btn_login).setOnClickListener(v ->
                 startActivity(new Intent(requireActivity(), LoginActivity.class)));
@@ -69,11 +68,7 @@ public class SettingFragment extends Fragment {
         view.findViewById(R.id.layout_profile_header).setOnClickListener(v -> toggle());
         view.findViewById(R.id.btn_edit_profile).setOnClickListener(v -> edit());
 
-        nightSwitch.setOnCheckedChangeListener((v, checked) -> {
-            saveNight(checked);
-            Toast.makeText(requireContext(), checked ? "夜間模式開啟" : "夜間模式關閉", Toast.LENGTH_SHORT).show();
-        });
-        loadNight();
+//        loadNight();
     }
 
     private void initVM() {
@@ -244,16 +239,16 @@ public class SettingFragment extends Fragment {
         userInfoLayout.setVisibility(login ? View.VISIBLE : View.GONE);
     }
 
-    private void loadNight() {
-        boolean night = requireActivity().getSharedPreferences("AppSettings", Context.MODE_PRIVATE)
-                .getBoolean("night_mode", false);
-        nightSwitch.setChecked(night);
-    }
+//    private void loadNight() {
+//        boolean night = requireActivity().getSharedPreferences("AppSettings", Context.MODE_PRIVATE)
+//                .getBoolean("night_mode", false);
+//        nightSwitch.setChecked(night);
+//    }
 
-    private void saveNight(boolean night) {
-        requireActivity().getSharedPreferences("AppSettings", Context.MODE_PRIVATE)
-                .edit().putBoolean("night_mode", night).apply();
-    }
+//    private void saveNight(boolean night) {
+//        requireActivity().getSharedPreferences("AppSettings", Context.MODE_PRIVATE)
+//                .edit().putBoolean("night_mode", night).apply();
+//    }
 
     private SharedPreferences getPrefs() {
         return requireActivity().getSharedPreferences("Myprefs", Context.MODE_PRIVATE);
