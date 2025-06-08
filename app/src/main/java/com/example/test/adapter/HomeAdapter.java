@@ -22,7 +22,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class HomeAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
-    private List<ItemList> items = new ArrayList<>();
+    private List<MangaItem> items = new ArrayList<>();
     public static final int TYPE_CATEGORY = 1;
     public static final int TYPE_MANGA = 2;
 
@@ -32,7 +32,7 @@ public class HomeAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
         this.listener = listener;
     }
     @SuppressLint("NotifyDataSetChanged")
-    public void setItems(List<ItemList> items) {
+    public void setItems(List<MangaItem> items) {
         this.items = items;
         notifyDataSetChanged();
     }
@@ -59,7 +59,7 @@ public class HomeAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
     @Override
     public void onBindViewHolder(@NonNull RecyclerView.ViewHolder holder, int position) {
         if(holder instanceof CategoryViewHolder){
-            ((CategoryViewHolder) holder).title.setText(((CategoryTitleItem)items.get(position)).getCategoryTitle());
+//            ((CategoryViewHolder) holder).title.setText(((CategoryTitleItem)items.get(position)).getCategoryTitle());
         }else{
             MangaItem manga = (MangaItem) items.get(position);
             ((MangaViewHolder) holder).title.setText(manga.getTitle());
