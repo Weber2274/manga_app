@@ -7,6 +7,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
@@ -14,12 +15,20 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.bumptech.glide.Glide;
 import com.example.test.R;
 import com.example.test.model.MangaItem;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.firestore.DocumentReference;
+import com.google.firebase.firestore.FirebaseFirestore;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class HistoryAdapter extends RecyclerView.Adapter<HistoryAdapter.HistoryViewHolder> {
-
+    FirebaseFirestore db = FirebaseFirestore.getInstance();
+    FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+    String uid = user.getUid();
     private List<MangaItem> mangaList = new ArrayList<>();
     public interface OnItemClickListener {
         void onItemClick(MangaItem item);
@@ -39,7 +48,7 @@ public class HistoryAdapter extends RecyclerView.Adapter<HistoryAdapter.HistoryV
     @Override
     public HistoryViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         View view = LayoutInflater.from(parent.getContext())
-                .inflate(R.layout.item_book, parent, false);
+                .inflate(R.layout.item_history, parent, false);
         return new HistoryViewHolder(view);
     }
 
@@ -47,6 +56,7 @@ public class HistoryAdapter extends RecyclerView.Adapter<HistoryAdapter.HistoryV
     public void onBindViewHolder(@NonNull HistoryViewHolder holder, int position) {
         MangaItem mangaItem = mangaList.get(position);
         holder.title.setText(mangaItem.getTitle());
+
         Glide.with(holder.itemView.getContext())
                 .load(mangaItem.getImgUrl())
                 .into(holder.cover);
@@ -54,6 +64,15 @@ public class HistoryAdapter extends RecyclerView.Adapter<HistoryAdapter.HistoryV
             if (listener != null) {
                 listener.onItemClick(mangaItem);
             }
+        });
+
+        DocumentReference historyDoc = db.collection("users")
+                .document(uid)
+                .collection("history")
+                .document(mangaItem.getTitle());
+        historyDoc.get().addOnSuccessListener(documentSnapshot -> {
+                String latest = documentSnapshot.getString("latest");
+                holder.latest.setText("上次閱讀:第"+latest+"話");
         });
     }
 
@@ -66,11 +85,13 @@ public class HistoryAdapter extends RecyclerView.Adapter<HistoryAdapter.HistoryV
     public static class HistoryViewHolder extends RecyclerView.ViewHolder {
         TextView title;
         ImageView cover;
+        TextView latest;
 
         public HistoryViewHolder(@NonNull View itemView) {
             super(itemView);
             title = itemView.findViewById(R.id.textTitle);
             cover = itemView.findViewById(R.id.imageCover);
+            latest = itemView.findViewById(R.id.history_latest);
         }
     }
 }

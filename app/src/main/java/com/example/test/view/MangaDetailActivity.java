@@ -41,7 +41,7 @@ public class MangaDetailActivity extends AppCompatActivity {
     private TextView mangaTitle,author,region,year,status;
     private ProgressBar progressBar;
     private Toolbar toolbar;
-    private Button like;
+    private Button like, read;
     private RecyclerView recyclerView;
     private String title;
     @SuppressLint({"SetTextI18n", "MissingInflatedId", "SetJavaScriptEnabled"})
@@ -64,10 +64,12 @@ public class MangaDetailActivity extends AppCompatActivity {
         status = findViewById(R.id.detail_status);
         recyclerView = findViewById(R.id.chapter_recyclerview);
         title = getIntent().getStringExtra("title");
-
+        like = findViewById(R.id.btn_like);
+        read = findViewById(R.id.btn_read);
+        FirebaseFirestore db = FirebaseFirestore.getInstance();
         FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+        String uid = user.getUid();
         if (user != null) {
-            String uid = user.getUid();
             DocumentReference favDocRef = FirebaseFirestore.getInstance()
                     .collection("users").document(uid)
                     .collection("favorites").document(title);
@@ -81,12 +83,8 @@ public class MangaDetailActivity extends AppCompatActivity {
             });
         }
 
-        like = findViewById(R.id.btn_like);
         like.setOnClickListener(view -> {
-
             if (user != null) {
-                String uid = user.getUid();
-                FirebaseFirestore db = FirebaseFirestore.getInstance();
                 SharedPreferences prefs = getSharedPreferences("Myprefs", MODE_PRIVATE);
                 SharedPreferences.Editor editor = prefs.edit();
 
@@ -136,14 +134,53 @@ public class MangaDetailActivity extends AppCompatActivity {
                                 });
                     }
                 });
-
             } else {
                 Toast.makeText(MangaDetailActivity.this, "請先登入才能使用收藏功能", Toast.LENGTH_SHORT).show();
                 Intent intent = new Intent(MangaDetailActivity.this, LoginActivity.class);
                 startActivity(intent);
             }
         });
-        String title = getIntent().getStringExtra("title");
+
+        String[] comicId = new String[1];
+        read.setOnClickListener(view -> {
+            DocumentReference historyDoc = db.collection("users")
+                    .document(uid)
+                    .collection("history")
+                    .document(title);
+            historyDoc.get().addOnSuccessListener(documentSnapshot -> {
+                if (documentSnapshot.exists()) {
+                    historyDoc.update("latest", "1")
+                            .addOnSuccessListener(aVoid -> Log.d("History", "最新章節已更新"))
+                            .addOnFailureListener(e -> Log.e("History", "更新 latest 失敗", e));
+                } else {
+                    db.collection("comics")
+                            .whereEqualTo("title", title)
+                            .limit(1)
+                            .get()
+                            .addOnSuccessListener(querySnapshot -> {
+                                if (!querySnapshot.isEmpty()) {
+                                    DocumentReference comicRef = querySnapshot.getDocuments()
+                                            .get(0).getReference();
+
+                                    Map<String, Object> data = new HashMap<>();
+                                    data.put("comic", comicRef);
+                                    data.put("latest", "1");
+
+                                    historyDoc.set(data)
+                                            .addOnSuccessListener(aVoid -> Log.d("History", "歷史紀錄已新增"))
+                                            .addOnFailureListener(e -> Log.e("History", "新增紀錄失敗", e));
+                                } else {
+                                    Toast.makeText(this, "找不到該漫畫", Toast.LENGTH_SHORT).show();
+                                }
+                            });
+                }
+            });
+
+            Intent intent = new Intent(MangaDetailActivity.this, ChapterActivity.class);
+            intent.putExtra("comicId", comicId[0]);
+            intent.putExtra("chapter", 1);
+            startActivity(intent);
+        });
 
         MangaDetailViewModel viewModel = new ViewModelProvider(this).get(MangaDetailViewModel.class);
         viewModel.loadMangaDetail(title);
@@ -154,7 +191,8 @@ public class MangaDetailActivity extends AppCompatActivity {
                 progressBar.setVisibility(View.GONE);
             }
         });
-        String[] comicId = new String[1];
+
+
         viewModel.getMangaDetailLiveData().observe(this, mangaDetail -> {
             if(mangaDetail != null){
                 comicId[0] = mangaDetail.getId();
@@ -170,6 +208,39 @@ public class MangaDetailActivity extends AppCompatActivity {
 
         ChapterAdapter adapter = new ChapterAdapter();
         adapter.setOnItemClickListener(chapterNumber -> {
+            DocumentReference historyDoc = db.collection("users")
+                    .document(uid)
+                    .collection("history")
+                    .document(title);
+            historyDoc.get().addOnSuccessListener(documentSnapshot -> {
+                if (documentSnapshot.exists()) {
+                    historyDoc.update("latest", Integer.toString(chapterNumber))
+                            .addOnSuccessListener(aVoid -> Log.d("History", "最新章節已更新"))
+                            .addOnFailureListener(e -> Log.e("History", "更新 latest 失敗", e));
+                } else {
+                    db.collection("comics")
+                            .whereEqualTo("title", title)
+                            .limit(1)
+                            .get()
+                            .addOnSuccessListener(querySnapshot -> {
+                                if (!querySnapshot.isEmpty()) {
+                                    DocumentReference comicRef = querySnapshot.getDocuments()
+                                            .get(0).getReference();
+
+                                    Map<String, Object> data = new HashMap<>();
+                                    data.put("comic", comicRef);
+                                    data.put("latest", Integer.toString(chapterNumber));
+
+                                    historyDoc.set(data)
+                                            .addOnSuccessListener(aVoid -> Log.d("History", "歷史紀錄已新增"))
+                                            .addOnFailureListener(e -> Log.e("History", "新增紀錄失敗", e));
+                                } else {
+                                    Toast.makeText(this, "找不到該漫畫", Toast.LENGTH_SHORT).show();
+                                }
+                            });
+                }
+            });
+
             Intent intent = new Intent(MangaDetailActivity.this, ChapterActivity.class);
             intent.putExtra("comicId", comicId[0]);
             intent.putExtra("chapter", chapterNumber);
